@@ -92,9 +92,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__fresh_products_v_version_availability" AS ENUM('available', 'seasonal', 'unavailable', 'to-confirm');
   CREATE TYPE "public"."enum__fresh_products_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum__fresh_products_v_published_locale" AS ENUM('en', 'fr');
+  CREATE TYPE "public"."enum_events_event_status" AS ENUM('concept', 'coming-soon', 'registration-open', 'sold-out', 'completed');
   CREATE TYPE "public"."enum_events_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_events_schedule_currency" AS ENUM('GHS', 'USD', 'EUR');
   CREATE TYPE "public"."enum_events_registration_mode" AS ENUM('interest-only', 'external-link', 'internal-registration');
+  CREATE TYPE "public"."enum__events_v_version_event_status" AS ENUM('concept', 'coming-soon', 'registration-open', 'sold-out', 'completed');
   CREATE TYPE "public"."enum__events_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum__events_v_version_schedule_currency" AS ENUM('GHS', 'USD', 'EUR');
   CREATE TYPE "public"."enum__events_v_version_registration_mode" AS ENUM('interest-only', 'external-link', 'internal-registration');
@@ -1653,7 +1655,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "events" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"seed_key" varchar,
-  	"status" "enum_events_status" DEFAULT 'concept',
+	"event_status" "enum_events_event_status" DEFAULT 'concept',
   	"schedule_date" timestamp(3) with time zone,
   	"schedule_capacity" numeric,
   	"schedule_price" numeric,
@@ -1701,7 +1703,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"id" serial PRIMARY KEY NOT NULL,
   	"parent_id" integer,
   	"version_seed_key" varchar,
-  	"version_status" "enum__events_v_version_status" DEFAULT 'concept',
+	"version_event_status" "enum__events_v_version_event_status" DEFAULT 'concept',
   	"version_schedule_date" timestamp(3) with time zone,
   	"version_schedule_capacity" numeric,
   	"version_schedule_price" numeric,
@@ -3974,9 +3976,11 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__fresh_products_v_version_availability";
   DROP TYPE "public"."enum__fresh_products_v_version_status";
   DROP TYPE "public"."enum__fresh_products_v_published_locale";
+  DROP TYPE "public"."enum_events_event_status";
   DROP TYPE "public"."enum_events_status";
   DROP TYPE "public"."enum_events_schedule_currency";
   DROP TYPE "public"."enum_events_registration_mode";
+  DROP TYPE "public"."enum__events_v_version_event_status";
   DROP TYPE "public"."enum__events_v_version_status";
   DROP TYPE "public"."enum__events_v_version_schedule_currency";
   DROP TYPE "public"."enum__events_v_version_registration_mode";

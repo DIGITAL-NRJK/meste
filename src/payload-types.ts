@@ -820,7 +820,7 @@ export interface Event {
    * URL segment. Lowercase letters, numbers, and hyphens only; changes may create redirects.
    */
   slug: string;
-  status: 'concept' | 'coming-soon' | 'registration-open' | 'sold-out' | 'completed';
+  eventStatus: 'concept' | 'coming-soon' | 'registration-open' | 'sold-out' | 'completed';
   theme?: string | null;
   shortDescription?: string | null;
   story?: {
@@ -2278,7 +2278,7 @@ export interface EventsSelect<T extends boolean = true> {
   seedKey?: T;
   title?: T;
   slug?: T;
-  status?: T;
+  eventStatus?: T;
   theme?: T;
   shortDescription?: T;
   story?: T;

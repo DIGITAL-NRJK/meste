@@ -11,7 +11,7 @@ export const Events: CollectionConfig = withSlugRedirects(
   createEditorialCollection({
     slug: 'events',
     admin: {
-      defaultColumns: ['title', 'status', 'date', '_status'],
+      defaultColumns: ['title', 'eventStatus', 'date', '_status'],
       description:
         'Event architecture for future real editions. Do not invent dates, venues, capacity, or price.',
       useAsTitle: 'title',
@@ -26,7 +26,7 @@ export const Events: CollectionConfig = withSlugRedirects(
       },
       slugField(),
       {
-        name: 'status',
+        name: 'eventStatus',
         type: 'select',
         defaultValue: 'concept',
         options: ['concept', 'coming-soon', 'registration-open', 'sold-out', 'completed'],

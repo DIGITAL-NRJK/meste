@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { Events } from '@/collections/Events'
 import { normalizeSlug } from '@/collections/fields/slug'
 import { publishedLocaleWhere } from '@/lib/payload/publication'
 import {
@@ -11,6 +12,15 @@ import {
 } from '@/seed/data'
 
 describe('Phase 3 content model', () => {
+  it('keeps the event lifecycle distinct from Payload draft status', () => {
+    const fieldNames = Events.fields
+      .filter((field) => 'name' in field)
+      .map((field) => ('name' in field ? field.name : undefined))
+
+    expect(fieldNames).toContain('eventStatus')
+    expect(fieldNames).not.toContain('status')
+  })
+
   it('normalizes slugs deterministically', () => {
     expect(normalizeSlug('  Côte & Cendre  ')).toBe('cote-cendre')
     expect(normalizeSlug('Mama Emma Fresh')).toBe('mama-emma-fresh')
