@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "24.14.0"
   PNPM_VERSION = "11.16.0"
+  # Turbopack writes a build cache under .next/cache (surfaced by Netlify as
+  # .netlify/.next/cache). That directory is never deployed, but the secrets
+  # scanner reads it and finds PAYLOAD_SECRET there, because payload.config.ts
+  # evaluates the server environment at build time. Only the cache is exempt:
+  # scanning stays enabled for the deployed output, where it matters.
+  SECRETS_SCAN_OMIT_PATHS = ".next/cache/**,.netlify/.next/cache/**"
 
 [context.production]
   command = "pnpm payload migrate && pnpm build"
@@ -23,3 +29,6 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     X-Frame-Options = "SAMEORIGIN"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
