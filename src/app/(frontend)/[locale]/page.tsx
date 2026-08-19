@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { HomeComposition } from '@/components/home/HomeComposition'
 import { formatPageTitle } from '@/lib/i18n/site'
 import { isLocale, locales } from '@/lib/i18n/config'
+import { getEntryContent } from '@/lib/payload/queries/entry'
 import { getHomeContent } from '@/lib/payload/queries/home'
 import { getSiteChrome } from '@/lib/payload/queries/chrome'
 
@@ -39,7 +40,11 @@ export default async function LocalePage({ params }: LocalePageProps) {
     notFound()
   }
 
-  const [content, chrome] = await Promise.all([getHomeContent(locale), getSiteChrome(locale)])
+  const [content, chrome, entry] = await Promise.all([
+    getHomeContent(locale),
+    getSiteChrome(locale),
+    getEntryContent(locale),
+  ])
 
-  return <HomeComposition chrome={chrome} content={content} locale={locale} />
+  return <HomeComposition chrome={chrome} content={content} entry={entry} locale={locale} />
 }

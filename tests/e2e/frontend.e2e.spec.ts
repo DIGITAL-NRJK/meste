@@ -41,6 +41,17 @@ test.describe('bilingual homepage', () => {
     await expect(page.getByText('References available on request')).toBeVisible()
   })
 
+  /**
+   * The entry veil ships disabled. Merging it must not change what a visitor
+   * sees until an editor turns it on in Payload.
+   */
+  test('does not show the entry veil until it is enabled', async ({ page }) => {
+    await page.goto('/en')
+
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  })
+
   test('returns the branded not-found state for an unsupported locale', async ({ page }) => {
     const response = await page.goto('/de')
     expect(response?.status()).toBe(404)

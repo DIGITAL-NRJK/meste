@@ -124,6 +124,7 @@ export interface Config {
     header: Header;
     footer: Footer;
     'home-page': HomePage;
+    'entry-screen': EntryScreen;
     'contact-settings': ContactSetting;
     'seo-settings': SeoSetting;
   };
@@ -132,6 +133,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
+    'entry-screen': EntryScreenSelect<false> | EntryScreenSelect<true>;
     'contact-settings': ContactSettingsSelect<false> | ContactSettingsSelect<true>;
     'seo-settings': SeoSettingsSelect<false> | SeoSettingsSelect<true>;
   };
@@ -3038,6 +3040,45 @@ export interface HomePage {
   createdAt?: string | null;
 }
 /**
+ * Optional threshold shown over the homepage on first arrival. Disabled by default. It never replaces the homepage: the address stays the same and search engines always receive the homepage itself.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "entry-screen".
+ */
+export interface EntryScreen {
+  id: number;
+  /**
+   * When off, visitors land directly on the homepage. When on, they see this threshold once per browsing session.
+   */
+  enabled?: boolean | null;
+  /**
+   * Small line above the headline. Leave empty to use the approved default.
+   */
+  eyebrow?: string | null;
+  /**
+   * The headline. Leave empty to use the approved default.
+   */
+  heading?: string | null;
+  /**
+   * One or two sentences. Leave empty to use the approved default.
+   */
+  body?: string | null;
+  /**
+   * Label of the button that opens the site.
+   */
+  ctaLabel?: string | null;
+  /**
+   * A locale is public only after its copy and required media have been reviewed. Publishing alone is not sufficient.
+   */
+  localeReadiness?: {
+    en?: boolean | null;
+    fr?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Verified public contact details. Empty values are never rendered.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3477,6 +3518,27 @@ export interface HomePageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "entry-screen_select".
+ */
+export interface EntryScreenSelect<T extends boolean = true> {
+  enabled?: T;
+  eyebrow?: T;
+  heading?: T;
+  body?: T;
+  ctaLabel?: T;
+  localeReadiness?:
+    | T
+    | {
+        en?: T;
+        fr?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact-settings_select".
  */
 export interface ContactSettingsSelect<T extends boolean = true> {
@@ -3613,7 +3675,9 @@ export interface TaskSchedulePublish {
           relationTo: 'journal-posts';
           value: number | JournalPost;
         } | null);
-    global?: ('site-settings' | 'header' | 'footer' | 'home-page' | 'contact-settings' | 'seo-settings') | null;
+    global?:
+      | ('site-settings' | 'header' | 'footer' | 'home-page' | 'entry-screen' | 'contact-settings' | 'seo-settings')
+      | null;
     user?: (number | null) | User;
   };
   output?: unknown;
