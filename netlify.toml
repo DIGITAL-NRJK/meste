@@ -11,6 +11,9 @@
   # evaluates the server environment at build time. Only the cache is exempt:
   # scanning stays enabled for the deployed output, where it matters.
   SECRETS_SCAN_OMIT_PATHS = ".next/cache/**,.netlify/.next/cache/**"
+  # A bucket name is a configuration identifier, not a credential: knowing it
+  # grants no access. The R2 credentials are never exempted from scanning.
+  SECRETS_SCAN_OMIT_KEYS = "R2_BUCKET"
 
 [context.production]
   command = "pnpm payload migrate && pnpm build"
