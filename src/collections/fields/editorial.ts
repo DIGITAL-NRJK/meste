@@ -1,6 +1,9 @@
 import type { CollectionConfig, Field, GlobalConfig } from 'payload'
 
-import { publishedOrAuthenticated } from '@/collections/access/roles'
+import {
+  publishedConfigOrAuthenticated,
+  publishedOrAuthenticated,
+} from '@/collections/access/roles'
 import { createCollectionHooks, createGlobalHooks } from '@/hooks/revalidateContent'
 
 import { localeReadinessField, seoFields } from './shared'
@@ -11,6 +14,16 @@ const draftConfiguration = {
     showSaveDraftButton: true,
   },
   schedulePublish: true,
+}
+
+/**
+ * A document filtered on locale readiness must actually carry the field, or
+ * Payload rejects the access constraint at query time. Deriving the policy from
+ * the same flag that adds the field keeps the two in step for every future
+ * collection and global.
+ */
+function readPolicy(includeLocaleReadiness: boolean) {
+  return includeLocaleReadiness ? publishedOrAuthenticated : publishedConfigOrAuthenticated
 }
 
 type EditorialCollectionOptions = {
@@ -37,7 +50,7 @@ export function createEditorialCollection({
     access: {
       create: ({ req }) => Boolean(req.user),
       delete: ({ req }) => Boolean(req.user),
-      read: publishedOrAuthenticated,
+      read: readPolicy(includeLocaleReadiness),
       readVersions: ({ req }) => Boolean(req.user),
       update: ({ req }) => Boolean(req.user),
     },
@@ -84,7 +97,7 @@ export function createEditorialGlobal({
   return {
     slug,
     access: {
-      read: publishedOrAuthenticated,
+      read: readPolicy(includeLocaleReadiness),
       readVersions: ({ req }) => Boolean(req.user),
       update: ({ req }) => Boolean(req.user),
     },

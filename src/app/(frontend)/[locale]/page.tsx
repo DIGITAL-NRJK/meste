@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { HomeComposition } from '@/components/home/HomeComposition'
+import { formatPageTitle } from '@/lib/i18n/site'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getHomeContent } from '@/lib/payload/queries/home'
 import { getSiteChrome } from '@/lib/payload/queries/chrome'
@@ -25,7 +26,9 @@ export async function generateMetadata({ params }: LocalePageProps): Promise<Met
 
   return {
     description: content.meta.description,
-    title: content.meta.title,
+    // Absolute, so the brand is in the title regardless of how Next resolves
+    // the layout template for a page in the same segment.
+    title: { absolute: formatPageTitle(locale, content.meta.title) },
   }
 }
 

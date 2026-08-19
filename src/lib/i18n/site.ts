@@ -26,3 +26,22 @@ const dictionaries: Record<Locale, SiteDictionary> = {
 export function getSiteDictionary(locale: Locale): SiteDictionary {
   return dictionaries[locale]
 }
+
+/**
+ * Builds a complete document title.
+ *
+ * Next.js only applies a layout's `title.template` to nested route segments, so
+ * a page sitting beside its layout would ship a title with no brand in it.
+ * Pages compose their title here and publish it as `absolute`, which makes the
+ * result identical wherever the page lives in the route tree.
+ */
+export function formatPageTitle(locale: Locale, title: string): string {
+  const dictionary = dictionaries[locale]
+  const trimmed = title.trim()
+
+  if (!trimmed) {
+    return dictionary.defaultTitle
+  }
+
+  return dictionary.titleTemplate.replace('%s', trimmed)
+}

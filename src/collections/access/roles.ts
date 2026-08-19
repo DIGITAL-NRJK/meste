@@ -49,6 +49,27 @@ export const publishedOrAuthenticated: Access = ({ req }) => {
   }
 }
 
+/**
+ * Read policy for documents that carry no per-locale editorial review.
+ *
+ * `publishedOrAuthenticated` filters on `localeReadiness.<locale>`, which only
+ * exists when the factory adds the field. Applying it to a configuration
+ * document makes Payload reject the query path with "Cannot find field for path
+ * at localeReadiness" and fail the whole read. Anonymous callers still only ever
+ * see the published version.
+ */
+export const publishedConfigOrAuthenticated: Access = ({ req }) => {
+  if (req.user) {
+    return true
+  }
+
+  return {
+    _status: {
+      equals: 'published',
+    },
+  }
+}
+
 export const permittedPublishedOrAuthenticated: Access = ({ req }) => {
   if (req.user) {
     return true
