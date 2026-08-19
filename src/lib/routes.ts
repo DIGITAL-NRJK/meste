@@ -38,6 +38,32 @@ export function isRouteKey(value: unknown): value is RouteKey {
   return typeof value === 'string' && routeKeys.some((key) => key === value)
 }
 
+/**
+ * Reverse of `routePath`: turns the localized segments of an incoming URL back
+ * into a route key.
+ *
+ * Interior pages live under one catch-all segment rather than a folder per
+ * translated path, so this manifest stays the single place where a URL and a
+ * page meet. A segment belonging to the *other* locale resolves to null, which
+ * is what keeps `/fr/about` a branded 404 instead of a duplicate untranslated
+ * page.
+ */
+export function resolveRouteFromSegments(segments: string[], locale: Locale): RouteKey | null {
+  if (segments.length !== 1) {
+    return null
+  }
+
+  const [segment] = segments
+
+  for (const key of routeKeys) {
+    if (key !== 'home' && localizedSegments[key][locale] === segment) {
+      return key
+    }
+  }
+
+  return null
+}
+
 export function routePath(route: RouteKey, locale: Locale): string {
   const segment = localizedSegments[route][locale]
   return segment ? `/${locale}/${segment}` : `/${locale}`
