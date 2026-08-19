@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { Events } from '@/collections/Events'
 import { normalizeSlug } from '@/collections/fields/slug'
-import { publishedLocaleWhere } from '@/lib/payload/publication'
 import {
   freshProductSeed,
   menuCategorySeed,
@@ -24,18 +23,6 @@ describe('Phase 3 content model', () => {
   it('normalizes slugs deterministically', () => {
     expect(normalizeSlug('  Côte & Cendre  ')).toBe('cote-cendre')
     expect(normalizeSlug('Mama Emma Fresh')).toBe('mama-emma-fresh')
-  })
-
-  it('requires publication and explicit locale readiness in public queries', () => {
-    expect(publishedLocaleWhere('fr', { slug: { equals: 'histoire' } })).toEqual({
-      and: [
-        {
-          _status: { equals: 'published' },
-          'localeReadiness.fr': { equals: true },
-        },
-        { slug: { equals: 'histoire' } },
-      ],
-    })
   })
 
   it('keeps structural seed keys unique and factual', () => {

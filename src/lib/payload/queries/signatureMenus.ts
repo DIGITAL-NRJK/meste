@@ -3,8 +3,8 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getPayloadClient } from '@/lib/payload/client'
 import { mapSignatureMenu, type PublicSignatureMenu } from '@/lib/payload/mappers'
-import { publishedLocaleWhere } from '@/lib/payload/publication'
 
+/** Publication filtering comes from collection access control; see services.ts. */
 async function queryPublishedSignatureMenu(
   locale: Locale,
   slug: string,
@@ -19,7 +19,7 @@ async function queryPublishedSignatureMenu(
     locale,
     overrideAccess: false,
     pagination: false,
-    where: publishedLocaleWhere(locale, { slug: { equals: slug } }),
+    where: { slug: { equals: slug } },
   })
 
   const doc = result.docs[0]

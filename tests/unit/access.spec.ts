@@ -9,8 +9,9 @@ import {
   publishedOrAuthenticated,
 } from '@/collections/access/roles'
 
-function requestWithUser(role?: 'admin' | 'editor'): PayloadRequest {
+function requestWithUser(role?: 'admin' | 'editor', locale?: string): PayloadRequest {
   return {
+    locale,
     user: role
       ? {
           collection: 'users',
@@ -22,8 +23,8 @@ function requestWithUser(role?: 'admin' | 'editor'): PayloadRequest {
   } as unknown as PayloadRequest
 }
 
-function accessArgs(role?: 'admin' | 'editor'): AccessArgs {
-  return { req: requestWithUser(role) }
+function accessArgs(role?: 'admin' | 'editor', locale?: string): AccessArgs {
+  return { req: requestWithUser(role, locale) }
 }
 
 describe('CMS access policies', () => {
@@ -48,10 +49,32 @@ describe('CMS access policies', () => {
     })
   })
 
+  /**
+   * This filter is the single source of truth for public visibility: queries
+   * must never restate it, so its locale handling is asserted here instead.
+   */
+  it('follows the requested locale, and falls back to English when unsupported', async () => {
+    expect(await publishedOrAuthenticated(accessArgs(undefined, 'fr'))).toEqual({
+      _status: { equals: 'published' },
+      'localeReadiness.fr': { equals: true },
+    })
+
+    expect(await publishedOrAuthenticated(accessArgs(undefined, 'de'))).toEqual({
+      _status: { equals: 'published' },
+      'localeReadiness.en': { equals: true },
+    })
+  })
+
   it('requires both publication and display permission for public social proof', async () => {
     expect(await permittedPublishedOrAuthenticated(accessArgs())).toEqual({
       _status: { equals: 'published' },
       'localeReadiness.en': { equals: true },
+      permissionToDisplay: { equals: true },
+    })
+
+    expect(await permittedPublishedOrAuthenticated(accessArgs(undefined, 'fr'))).toEqual({
+      _status: { equals: 'published' },
+      'localeReadiness.fr': { equals: true },
       permissionToDisplay: { equals: true },
     })
   })
