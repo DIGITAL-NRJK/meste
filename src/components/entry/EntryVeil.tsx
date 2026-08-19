@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { LogoMark } from '@/components/layout/LogoMark'
 import { ENTRY_SESSION_KEY } from '@/lib/entry/content'
@@ -10,7 +10,7 @@ type EntryVeilProps = {
   content: EntryContent
 }
 
-type VeilState = 'open' | 'closing' | 'closed'
+type VeilPhase = 'open' | 'closing' | 'closed'
 
 const FADE_MS = 520
 
@@ -19,12 +19,34 @@ function backdropElements(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('[data-entry-backdrop]'))
 }
 
+/**
+ * The "already entered" flag lives on the document element, written once by the
+ * pre-paint script and never changed while the veil is on screen. Reading it
+ * through `useSyncExternalStore` keeps the hydration render identical to the
+ * server render, then re-renders with the browser's answer — without the
+ * cascading render an effect-driven `setState` would cause.
+ */
+const subscribeToEnteredFlag = () => () => {}
+
+function readEnteredFlag(): boolean {
+  return document.documentElement.dataset.entered === 'true'
+}
+
+function readServerEnteredFlag(): boolean {
+  return false
+}
+
 export function EntryVeil({ content }: EntryVeilProps) {
-  // The server always renders the veil open; the pre-paint script has already
-  // hidden it visually for a returning visitor, so this only re-syncs state.
-  const [state, setState] = useState<VeilState>('open')
+  const hasEntered = useSyncExternalStore(
+    subscribeToEnteredFlag,
+    readEnteredFlag,
+    readServerEnteredFlag,
+  )
+  const [phase, setPhase] = useState<VeilPhase>('open')
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const timerRef = useRef<number | undefined>(undefined)
+
+  const isVisible = !hasEntered && phase !== 'closed'
 
   const dismiss = useCallback(() => {
     try {
@@ -33,51 +55,53 @@ export function EntryVeil({ content }: EntryVeilProps) {
       // Private browsing can refuse storage; the veil still opens.
     }
 
-    document.documentElement.dataset.entered = 'true'
+    const settle = () => {
+      // Written only once the fade is over: the pre-paint rule hides the veil
+      // outright, which would cut the animation short mid-flight. Setting it
+      // here also keeps the veil down across client-side navigations.
+      document.documentElement.dataset.entered = 'true'
+      setPhase('closed')
+    }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (prefersReducedMotion) {
-      setState('closed')
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      settle()
       return
     }
 
-    setState('closing')
-    timerRef.current = window.setTimeout(() => setState('closed'), FADE_MS)
+    setPhase('closing')
+    timerRef.current = window.setTimeout(settle, FADE_MS)
   }, [])
 
-  useEffect(() => {
-    if (document.documentElement.dataset.entered === 'true') {
-      setState('closed')
-    }
-
-    return () => window.clearTimeout(timerRef.current)
-  }, [])
+  useEffect(() => () => window.clearTimeout(timerRef.current), [])
 
   useEffect(() => {
-    const isBlocking = state === 'open' || state === 'closing'
-
     for (const element of backdropElements()) {
-      element.inert = isBlocking
+      element.inert = isVisible
     }
 
-    document.body.style.overflow = isBlocking ? 'hidden' : ''
-
-    if (state === 'open') {
-      closeButtonRef.current?.focus()
-    }
-
-    if (state === 'closed') {
-      document.getElementById('main')?.focus({ preventScroll: true })
-    }
+    document.body.style.overflow = isVisible ? 'hidden' : ''
 
     return () => {
       document.body.style.overflow = ''
     }
-  }, [state])
+  }, [isVisible])
 
   useEffect(() => {
-    if (state !== 'open') {
+    if (isVisible && phase === 'open') {
+      closeButtonRef.current?.focus()
+    }
+  }, [isVisible, phase])
+
+  useEffect(() => {
+    // Only after a deliberate dismissal, so a returning visitor keeps the
+    // browser's natural entry point instead of being thrown into the page.
+    if (phase === 'closed') {
+      document.getElementById('main')?.focus({ preventScroll: true })
+    }
+  }, [phase])
+
+  useEffect(() => {
+    if (!isVisible || phase !== 'open') {
       return
     }
 
@@ -89,9 +113,9 @@ export function EntryVeil({ content }: EntryVeilProps) {
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [dismiss, state])
+  }, [dismiss, isVisible, phase])
 
-  if (state === 'closed') {
+  if (!isVisible) {
     return null
   }
 
@@ -100,7 +124,7 @@ export function EntryVeil({ content }: EntryVeilProps) {
       aria-labelledby="entry-heading"
       aria-modal="true"
       className="meste-entry"
-      data-state={state}
+      data-state={phase}
       role="dialog"
     >
       <div className="meste-entry__inner">
