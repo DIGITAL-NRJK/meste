@@ -35,7 +35,12 @@ const nextConfig: NextConfig = {
   ],
   images: {
     formats: ['image/avif', 'image/webp'],
-    localPatterns: [{ pathname: '/api/media/file/**' }],
+    localPatterns: [
+      // Payload media served by the app in local development.
+      { pathname: '/api/media/file/**' },
+      // Static brand assets imported from /public and emitted by the build.
+      { pathname: '/_next/static/media/**' },
+    ],
     remotePatterns: getR2RemotePattern(),
   },
   turbopack: {

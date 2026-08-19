@@ -7,7 +7,7 @@ import {
   isLocale,
   locales,
 } from '@/lib/i18n/config'
-import { getFoundationDictionary } from '@/lib/i18n/dictionaries'
+import { getSiteDictionary } from '@/lib/i18n/site'
 
 describe('locale foundation', () => {
   it('keeps English as the deterministic default', () => {
@@ -27,8 +27,12 @@ describe('locale foundation', () => {
     expect(getLocalePath('fr')).toBe('/fr')
   })
 
-  it('provides intentional copy for both foundation routes', () => {
-    expect(getFoundationDictionary('en').headline).toBe('The art of African hospitality.')
-    expect(getFoundationDictionary('fr').headline).toBe("L'art de l'hospitalité africaine.")
+  it('provides site-level metadata copy for both locales', () => {
+    for (const locale of locales) {
+      const copy = getSiteDictionary(locale)
+      expect(copy.defaultTitle).toContain('MESTE')
+      expect(copy.titleTemplate).toContain('%s')
+      expect(copy.defaultDescription.length).toBeGreaterThan(20)
+    }
   })
 })
