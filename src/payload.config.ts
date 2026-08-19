@@ -23,6 +23,7 @@ import { SignatureMenus } from './collections/SignatureMenus'
 import { Testimonials } from './collections/Testimonials'
 import { Users } from './collections/Users'
 import { ContactSettings } from './globals/ContactSettings'
+import { EntryScreen } from './globals/EntryScreen'
 import { Footer } from './globals/Footer'
 import { Header } from './globals/Header'
 import { HomePage } from './globals/HomePage'
@@ -91,7 +92,7 @@ export default buildConfig({
   graphQL: {
     disable: true,
   },
-  globals: [SiteSettings, Header, Footer, HomePage, ContactSettings, SEOSettings],
+  globals: [SiteSettings, Header, Footer, HomePage, EntryScreen, ContactSettings, SEOSettings],
   localization: {
     defaultLocale: 'en',
     fallback: false,
