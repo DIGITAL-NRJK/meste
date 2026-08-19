@@ -9,7 +9,9 @@ import {
 const validR2Environment = {
   R2_ACCESS_KEY_ID: 'access-key',
   R2_ACCOUNT_ID: 'account-id',
-  R2_BUCKET: 'meste-media',
+  // Deliberately not a real bucket name: fixtures must never collide with
+  // production identifiers, or CI secret scanners flag the file.
+  R2_BUCKET: 'example-bucket',
   R2_ENDPOINT: 'https://account-id.r2.cloudflarestorage.com',
   R2_PUBLIC_URL: 'https://media.example.com',
   R2_SECRET_ACCESS_KEY: 'secret-key',
@@ -49,7 +51,7 @@ describe('server environment', () => {
   })
 
   it('rejects a partial R2 configuration', () => {
-    vi.stubEnv('R2_BUCKET', 'meste-media')
+    vi.stubEnv('R2_BUCKET', 'example-bucket')
     resetServerEnvironmentForTests()
 
     expect(() => getServerEnvironment()).toThrow(/Configure every R2 variable/)
