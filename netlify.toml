@@ -36,17 +36,10 @@
 # Netlify UI. NEXT_PUBLIC_ variables are inlined at compile time, which is why
 # it is exported before the build rather than read at runtime.
 [context.deploy-preview]
-<<<<<<< Updated upstream
-  command = "export NEXT_PUBLIC_SERVER_URL=$DEPLOY_PRIME_URL && pnpm payload migrate && pnpm build"
-
-[context.branch-deploy]
-  command = "export NEXT_PUBLIC_SERVER_URL=$DEPLOY_PRIME_URL && pnpm payload migrate && pnpm build"
-=======
   command = "export NEXT_PUBLIC_SERVER_URL=$DEPLOY_PRIME_URL && pnpm payload migrate && pnpm generate:importmap && pnpm build"
 
 [context.branch-deploy]
   command = "export NEXT_PUBLIC_SERVER_URL=$DEPLOY_PRIME_URL && pnpm payload migrate && pnpm generate:importmap && pnpm build"
->>>>>>> Stashed changes
 
 [[headers]]
   for = "/*"
