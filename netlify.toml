@@ -11,18 +11,27 @@
   # evaluates the server environment at build time. Only the cache is exempt:
   # scanning stays enabled for the deployed output, where it matters.
   SECRETS_SCAN_OMIT_PATHS = ".next/cache/**,.netlify/.next/cache/**"
-  # A bucket name is a configuration identifier, not a credential: knowing it
-  # grants no access. The R2 credentials are never exempted from scanning.
-  SECRETS_SCAN_OMIT_KEYS = "R2_BUCKET"
+  # Netlify treats every environment variable as a secret by default. These
+  # three are public by design and are *meant* to appear in the deployed output:
+  #   R2_BUCKET          a configuration identifier; knowing it grants no access
+  #   R2_PUBLIC_URL      the public media origin, emitted in every <img src>
+  #   NEXT_PUBLIC_SERVER_URL  the canonical site origin, emitted in canonical
+  #                           links, JSON-LD and Open Graph tags
+  # Anything that actually grants access — PAYLOAD_SECRET, DATABASE_URL, the R2
+  # key pair, R2_ENDPOINT, R2_ACCOUNT_ID — stays scanned. Never add one here.
+  SECRETS_SCAN_OMIT_KEYS = "R2_BUCKET,R2_PUBLIC_URL,NEXT_PUBLIC_SERVER_URL"
 
 [context.production]
   command = "pnpm payload migrate && pnpm build"
 
+# Preview origins change on every build, so the value cannot live in the
+# Netlify UI. NEXT_PUBLIC_ variables are inlined at compile time, which is why
+# it is exported before the build rather than read at runtime.
 [context.deploy-preview]
-  command = "pnpm payload migrate && pnpm build"
+  command = "export NEXT_PUBLIC_SERVER_URL=$DEPLOY_PRIME_URL && pnpm payload migrate && pnpm build"
 
 [context.branch-deploy]
-  command = "pnpm payload migrate && pnpm build"
+  command = "export NEXT_PUBLIC_SERVER_URL=$DEPLOY_PRIME_URL && pnpm payload migrate && pnpm build"
 
 [[headers]]
   for = "/*"
