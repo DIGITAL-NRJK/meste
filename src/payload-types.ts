@@ -1067,8 +1067,10 @@ export interface MenuCategory {
   slug: string;
   family:
     | 'cocktail-classics'
+    | 'meste-signature-cocktails'
     | 'chef-cocktail-creations'
     | 'starters'
+    | 'heritage-african-roots'
     | 'fish-seafood'
     | 'poultry'
     | 'meat'

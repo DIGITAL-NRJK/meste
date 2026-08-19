@@ -4,10 +4,18 @@ import { createEditorialCollection } from './fields/editorial'
 import { seedKeyField, sortOrderField } from './fields/shared'
 import { slugField } from './fields/slug'
 
+/**
+ * The families named in the approved menu collection, in the order the brief
+ * lists them. `mama-emma-fresh` is deliberately absent: the beverage range has
+ * its own collection and its own page, and duplicating it here would create two
+ * sources of truth for the same six products.
+ */
 export const menuFamilies = [
   'cocktail-classics',
+  'meste-signature-cocktails',
   'chef-cocktail-creations',
   'starters',
+  'heritage-african-roots',
   'fish-seafood',
   'poultry',
   'meat',

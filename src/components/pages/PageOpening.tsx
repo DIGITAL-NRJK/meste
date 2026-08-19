@@ -30,7 +30,7 @@ export function PageOpening({ aside, content, headingId, media = null }: PageOpe
   return (
     <Section className="meste-page-opening" labelledBy={headingId} ruled>
       <div className={companion ? 'meste-page-opening__split' : undefined}>
-        <div className="meste-page-opening__copy">
+        <div className="meste-page-opening__copy" data-wide={companion ? undefined : ''}>
           <Eyebrow>{content.eyebrow}</Eyebrow>
 
           <DisplayHeading className="meste-page-opening__title" id={headingId}>

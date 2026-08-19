@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { locales } from '@/lib/i18n/config'
 import { getAboutBaseline } from '@/lib/pages/about/content'
 import { getContactBaseline } from '@/lib/pages/contact/content'
+import { getFreshBaseline } from '@/lib/pages/fresh/content'
+import { getMenusBaseline } from '@/lib/pages/menus/content'
+import { getServicesBaseline } from '@/lib/pages/services/content'
 import { resolveRouteFromSegments, routePath } from '@/lib/routes'
 
 const priceShapes = [/GH[₵S]|\bUSD\b|€|\$\d/, /\bà partir de \d|\bfrom \d+\s*(per|par)\b/i]
@@ -10,7 +13,7 @@ const priceShapes = [/GH[₵S]|\bUSD\b|€|\$\d/, /\bà partir de \d|\bfrom \d+\
 describe('interior route resolution', () => {
   it('round-trips every localized segment back to its route key', () => {
     for (const locale of locales) {
-      for (const route of ['about', 'contact'] as const) {
+      for (const route of ['about', 'services', 'menus', 'fresh', 'contact'] as const) {
         const segments = routePath(route, locale).split('/').slice(2)
         expect(resolveRouteFromSegments(segments, locale)).toBe(route)
       }
@@ -125,7 +128,13 @@ describe('contact page baseline', () => {
 describe('interior pages publish no price', () => {
   it('keeps both pages free of any monetary shape', () => {
     for (const locale of locales) {
-      const serialized = JSON.stringify([getAboutBaseline(locale), getContactBaseline(locale)])
+      const serialized = JSON.stringify([
+        getAboutBaseline(locale),
+        getServicesBaseline(locale),
+        getMenusBaseline(locale),
+        getFreshBaseline(locale),
+        getContactBaseline(locale),
+      ])
 
       for (const shape of priceShapes) {
         expect(serialized).not.toMatch(shape)
@@ -137,7 +146,13 @@ describe('interior pages publish no price', () => {
 describe('bilingual completeness', () => {
   it('leaves no empty string in either baseline', () => {
     for (const locale of locales) {
-      for (const baseline of [getAboutBaseline(locale), getContactBaseline(locale)]) {
+      for (const baseline of [
+        getAboutBaseline(locale),
+        getServicesBaseline(locale),
+        getMenusBaseline(locale),
+        getFreshBaseline(locale),
+        getContactBaseline(locale),
+      ]) {
         const empties: string[] = []
 
         JSON.stringify(baseline, (key, value) => {
@@ -149,6 +164,126 @@ describe('bilingual completeness', () => {
 
         expect(empties).toEqual([])
       }
+    }
+  })
+})
+
+describe('services page baseline', () => {
+  it('keeps the four worlds and the five formats the brief names', () => {
+    for (const locale of locales) {
+      const content = getServicesBaseline(locale)
+
+      expect(content.worlds.items).toHaveLength(4)
+      expect(content.worlds.items.map((world) => world.title)).toEqual([
+        'Celebrations',
+        'Corporate',
+        'Institutional & Diplomatic',
+        'Bespoke Experiences',
+      ])
+      expect(content.formats.items).toHaveLength(5)
+
+      for (const world of content.worlds.items) {
+        expect(world.items.length).toBeGreaterThan(2)
+      }
+    }
+  })
+
+  /**
+   * The brief supplies no guest range and forbids inventing one, so no number
+   * of guests may appear anywhere on this page.
+   */
+  it('publishes no guest range', () => {
+    for (const locale of locales) {
+      const serialized = JSON.stringify(getServicesBaseline(locale))
+
+      expect(serialized).not.toMatch(/\d+\s*(?:-|–|to|à)\s*\d+/)
+      expect(serialized).not.toMatch(/\d+\s*(guests|convives|personnes|pax)/i)
+    }
+  })
+
+  it('names no client and quotes no testimonial', () => {
+    for (const locale of locales) {
+      const content = getServicesBaseline(locale)
+
+      expect(content.references.heading.trim().length).toBeGreaterThan(5)
+      expect(JSON.stringify(content)).not.toMatch(/embassy of|ambassade de/i)
+    }
+  })
+})
+
+describe('menu collection baseline', () => {
+  it('carries the twelve signature dishes with their compositions', () => {
+    for (const locale of locales) {
+      const content = getMenusBaseline(locale)
+
+      expect(content.signatureDishes.items).toHaveLength(12)
+      expect(content.levels.items).toHaveLength(3)
+      expect(content.signatureMenus.items).toHaveLength(5)
+
+      for (const dish of content.signatureDishes.items) {
+        expect(dish.name.trim().length).toBeGreaterThan(3)
+        expect(dish.composition).toContain('/')
+      }
+    }
+  })
+
+  it('keeps dish names identical across locales', () => {
+    const en = getMenusBaseline('en').signatureDishes.items.map((dish) => dish.name)
+    const fr = getMenusBaseline('fr').signatureDishes.items.map((dish) => dish.name)
+
+    expect(fr).toEqual(en)
+  })
+
+  /**
+   * The brief forbids inferring allergens or dietary labels. Neither may reach
+   * the page until an editor enters verified data in the CMS.
+   */
+  it('infers no allergen and no dietary label', () => {
+    for (const locale of locales) {
+      const serialized = JSON.stringify(getMenusBaseline(locale))
+
+      expect(serialized).not.toMatch(/gluten|allerg|lactose|halal|vegan|sans porc|pork-free/i)
+    }
+  })
+})
+
+describe('Mama Emma Fresh baseline', () => {
+  it('lists the six approved products and nothing more', () => {
+    for (const locale of locales) {
+      const content = getFreshBaseline(locale)
+
+      expect(content.range.products).toEqual([
+        'Pineapple',
+        'Hibiscus / Bissap',
+        'Ginger',
+        'Pineapple & Beetroot',
+        'Pineapple & Orange',
+        'Pineapple & Watermelon',
+      ])
+      expect(content.range.signature).toBe('Crafted in Ghana.')
+    }
+  })
+
+  /**
+   * `Do NOT claim: Organic` — and no size, ingredient list or nutritional
+   * property either, since none of them has been verified.
+   */
+  it('claims nothing about the product it has not been given', () => {
+    for (const locale of locales) {
+      const serialized = JSON.stringify(getFreshBaseline(locale))
+
+      expect(serialized).not.toMatch(/organic|biologique|\bbio\b/i)
+      expect(serialized).not.toMatch(/\d+\s?(cl|ml|l\b|oz)/i)
+      expect(serialized).not.toMatch(/calorie|sugar-free|sans sucre|vitamin/i)
+    }
+  })
+
+  it('presents the culinary uses as possibility, never as recipe', () => {
+    expect(getFreshBaseline('en').culinary.intro).toMatch(/\bcan\b|\bmay\b/)
+    expect(getFreshBaseline('fr').culinary.intro).toMatch(/peuvent|peut/)
+
+    for (const locale of locales) {
+      expect(getFreshBaseline(locale).culinary.caveat.trim().length).toBeGreaterThan(10)
     }
   })
 })
