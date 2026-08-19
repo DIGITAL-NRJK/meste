@@ -1574,6 +1574,268 @@ html[data-entered='true'] .meste-entry {
   }
 }
 
+/* ==========================================================================
+   Interior pages — opening, chapters, held statement, contact, close
+   Built on the homepage primitives; no new visual language is introduced.
+   ========================================================================== */
+
+.meste-page-opening__split {
+  align-items: start;
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.75rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.meste-page-opening__title {
+  margin-top: 1.15rem;
+  max-width: 16ch;
+}
+
+.meste-page-opening__lede {
+  margin-top: 1.6rem;
+  max-width: 52ch;
+}
+
+@media (min-width: 60rem) {
+  .meste-page-opening__split {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+
+  .meste-page-opening__aside {
+    padding-top: 2.6rem;
+  }
+}
+
+/* Chapters ---------------------------------------------------------------- */
+
+.meste-chapters {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  list-style: none;
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+  padding: 0;
+}
+
+.meste-chapter {
+  border-top: 1px solid var(--meste-rule);
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.meste-chapter__index {
+  align-items: baseline;
+  display: flex;
+  gap: 1rem;
+  margin: 0 0 0.9rem;
+}
+
+.meste-chapter__index > span[aria-hidden] {
+  color: var(--meste-gold-numeral);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.meste-chapter__label {
+  color: var(--meste-gold-ink);
+}
+
+.meste-chapter__title {
+  margin: 0;
+  max-width: 20ch;
+}
+
+.meste-chapter__body {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.65;
+  margin: 0 0 0.9rem;
+  max-width: 62ch;
+}
+
+.meste-chapter__narrative > :last-child {
+  margin-bottom: 0;
+}
+
+.meste-chapter__list {
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-chapter__list li {
+  border-left: 1px solid var(--meste-gold);
+  color: var(--meste-text);
+  font-size: var(--meste-step-body);
+  line-height: 1.5;
+  padding-left: 0.85rem;
+}
+
+@media (min-width: 60rem) {
+  .meste-chapter {
+    column-gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  /* Without photography the chapter splits its own copy, so the row still
+     reads as a composition instead of a half-empty band. `display: contents`
+     lifts the two halves into the chapter grid without a wrapper row. */
+  .meste-chapter[data-media='false'] .meste-chapter__copy {
+    display: contents;
+  }
+
+  .meste-chapter[data-media='false'] .meste-chapter__head {
+    grid-column: 1 / span 4;
+  }
+
+  .meste-chapter[data-media='false'] .meste-chapter__narrative {
+    grid-column: 6 / span 7;
+  }
+
+  .meste-chapter[data-media='true'] .meste-chapter__copy {
+    grid-column: 1 / span 6;
+  }
+
+  .meste-chapter[data-media='true'] .meste-chapter__frame {
+    align-self: start;
+    grid-column: 8 / span 5;
+  }
+
+  .meste-chapter[data-media='true'][data-side='end'] .meste-chapter__copy {
+    grid-column: 7 / span 6;
+  }
+
+  .meste-chapter[data-media='true'][data-side='end'] .meste-chapter__frame {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
+}
+
+.meste-chapter__narrative {
+  margin-top: 1.1rem;
+}
+
+/* Held statement ---------------------------------------------------------- */
+
+.meste-pull-quote figure {
+  margin: 0;
+  text-align: center;
+}
+
+.meste-pull-quote blockquote {
+  margin: 0;
+}
+
+.meste-pull-quote blockquote p {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.9rem, 1.1rem + 3vw, 3.4rem);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin: 0 auto;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+.meste-pull-quote figcaption {
+  color: var(--meste-gold-light);
+  font-size: var(--meste-step-eyebrow);
+  letter-spacing: 0.24em;
+  margin-top: 1.75rem;
+  text-transform: uppercase;
+}
+
+/* Contact ----------------------------------------------------------------- */
+
+.meste-contact {
+  border: 1px solid var(--meste-rule);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.meste-contact__eyebrow {
+  color: var(--meste-gold-ink);
+}
+
+.meste-contact__title {
+  font-size: var(--meste-step-h3);
+  margin: 0.75rem 0 0;
+}
+
+.meste-contact__list {
+  display: grid;
+  margin: 1.5rem 0 0;
+}
+
+.meste-contact__entry {
+  border-top: 1px solid var(--meste-rule);
+  display: grid;
+  gap: 0.35rem;
+  padding-block: 1.1rem;
+}
+
+.meste-contact__entry:last-child {
+  padding-bottom: 0;
+}
+
+.meste-contact__entry dt {
+  color: var(--meste-gold-ink);
+  font-size: var(--meste-step-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.meste-contact__entry dd {
+  font-size: var(--meste-step-lede);
+  margin: 0;
+}
+
+.meste-contact__address {
+  display: grid;
+  font-style: normal;
+  gap: 0.2rem;
+}
+
+.meste-contact__hours,
+.meste-contact__social {
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-contact__hours li {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+
+/* Interior close ---------------------------------------------------------- */
+
+.meste-page-closing {
+  text-align: center;
+}
+
+.meste-page-closing__title {
+  color: var(--meste-ivory);
+  margin-inline: auto;
+  max-width: 20ch;
+}
+
+.meste-page-closing__body {
+  margin: 1.5rem auto 2.25rem;
+  max-width: 46ch;
+}
+
+.meste-page-closing .meste-actions {
+  justify-content: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -60,3 +60,46 @@ test.describe('bilingual homepage', () => {
     )
   })
 })
+
+test.describe('interior pages', () => {
+  test('serves the story page in both locales', async ({ page }) => {
+    await page.goto('/en/about')
+    await expect(page).toHaveTitle(/Our story — MESTE/)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('A cuisine inherited')
+
+    await page.getByRole('link', { name: 'FR', exact: true }).click()
+    await expect(page).toHaveURL('/fr/a-propos')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Une cuisine héritée')
+  })
+
+  test('tells the six approved chapters', async ({ page }) => {
+    await page.goto('/en/about')
+    await expect(page.locator('.meste-chapter')).toHaveCount(6)
+    await expect(page.getByText('Maya-Maya International Airport')).toBeVisible()
+  })
+
+  /**
+   * The English segment under the French locale would be a duplicate
+   * untranslated page, which the brief forbids.
+   */
+  test('rejects a segment belonging to the other locale', async ({ page }) => {
+    const response = await page.goto('/fr/about')
+    expect(response?.status()).toBe(404)
+  })
+
+  test('publishes the verified phone number and nothing else', async ({ page }) => {
+    await page.goto('/en/contact')
+
+    await expect(page.getByRole('link', { name: '0537464516' }).first()).toHaveAttribute(
+      'href',
+      'tel:0537464516',
+    )
+    await expect(page.getByText('Email', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('Hours', { exact: true })).toHaveCount(0)
+  })
+
+  test('returns the branded not-found state for a page that is not built yet', async ({ page }) => {
+    const response = await page.goto('/en/services')
+    expect(response?.status()).toBe(404)
+  })
+})
