@@ -5,37 +5,68 @@
   --font-serif: var(--font-display);
 }
 
+/* ==========================================================================
+   MESTE brand tokens
+   Palette from the master brief. Gold is split into three roles because the
+   brand gold (#C99A3A) reaches only 2.27:1 on ivory and must never carry text.
+   ========================================================================== */
+
 :root {
   --meste-burgundy: #5a0d18;
   --meste-burgundy-dark: #3e0810;
+  --meste-burgundy-deep: #1a0508;
   --meste-burgundy-light: #7a1c2b;
   --meste-forest: #173d27;
   --meste-forest-dark: #0d2a19;
   --meste-forest-light: #2c5b3d;
+
+  /* Decorative gold only: rules, hairlines, borders, ornaments. */
   --meste-gold: #c99a3a;
+  /* Large display numerals (>=24px) — 3.7:1 on ivory, 3.41:1 on deep ivory. */
+  --meste-gold-numeral: #a0741c;
+  /* Small gold text such as eyebrows — 5.85:1 on ivory. */
+  --meste-gold-ink: #7e5410;
+  /* Gold on dark grounds — 6.72:1 on forest, 7.74:1 on burgundy. */
   --meste-gold-light: #dfbd70;
+
   --meste-ivory: #f6f0e5;
-  --meste-ivory-deep: #e9dfcf;
+  --meste-ivory-deep: #efe7d8;
   --meste-charcoal: #252525;
   --meste-black: #111111;
+  --meste-muted: #57524a;
+
   --meste-surface: var(--meste-ivory);
+  --meste-surface-alt: var(--meste-ivory-deep);
   --meste-text: var(--meste-charcoal);
-  --meste-border: rgb(90 13 24 / 18%);
-  --meste-focus: var(--meste-gold);
-  --meste-page-gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --meste-rule: rgb(37 37 37 / 15%);
+  --meste-rule-strong: rgb(37 37 37 / 28%);
+  --meste-focus: var(--meste-burgundy);
+
+  --meste-page-gutter: clamp(1.25rem, 4vw, 3.5rem);
   --meste-container: 90rem;
+  --meste-section-space: clamp(3.75rem, 7vw, 5.75rem);
+
+  --meste-step-eyebrow: 0.66rem;
+  --meste-step-body: clamp(0.95rem, 0.9rem + 0.2vw, 1.03rem);
+  --meste-step-lede: clamp(1.02rem, 0.95rem + 0.35vw, 1.18rem);
+  --meste-step-h2: clamp(2.1rem, 1.4rem + 2.6vw, 3.1rem);
+  --meste-step-h3: clamp(1.35rem, 1.1rem + 0.9vw, 1.7rem);
+  --meste-step-display: clamp(3rem, 1.5rem + 6.4vw, 6.2rem);
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 html {
   background: var(--meste-surface);
   color: var(--meste-text);
-  font-family: var(--font-interface), sans-serif;
+  font-family: var(--font-interface), system-ui, sans-serif;
   scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -43,12 +74,1211 @@ body {
   min-width: 20rem;
 }
 
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--meste-burgundy);
+  color: var(--meste-ivory);
+}
+
+:focus-visible {
+  outline: 2px solid var(--meste-focus);
+  outline-offset: 3px;
+}
+
+.meste-skip-link {
+  background: var(--meste-burgundy);
+  color: var(--meste-ivory);
+  font-size: 0.72rem;
+  font-weight: 700;
+  left: 1rem;
+  letter-spacing: 0.12em;
+  padding: 0.85rem 1.15rem;
+  position: fixed;
+  text-transform: uppercase;
+  top: -6rem;
+  transition: top 0.18s ease;
+  z-index: 200;
+}
+
+.meste-skip-link:focus-visible {
+  top: 1rem;
+}
+
+/* ==========================================================================
+   Layout primitives
+   ========================================================================== */
+
+.meste-container {
+  margin-inline: auto;
+  max-width: var(--meste-container);
+  padding-inline: var(--meste-page-gutter);
+  width: 100%;
+}
+
+.meste-section {
+  padding-block: var(--meste-section-space);
+}
+
+.meste-section--tight {
+  padding-block: clamp(2.5rem, 4.5vw, 3.5rem);
+}
+
+.meste-section--flush-bottom {
+  padding-bottom: 0;
+}
+
+.meste-section--alt {
+  background: var(--meste-surface-alt);
+}
+
+.meste-section--forest {
+  background: var(--meste-forest);
+  color: var(--meste-ivory);
+}
+
+.meste-section--burgundy {
+  background: var(--meste-burgundy);
+  color: var(--meste-ivory);
+}
+
+.meste-section--ruled {
+  border-top: 1px solid var(--meste-rule);
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+.meste-eyebrow {
+  color: var(--meste-gold-ink);
+  font-size: var(--meste-step-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  line-height: 1.5;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.meste-display-heading {
+  color: var(--meste-burgundy);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--meste-step-display);
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  line-height: 0.98;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.meste-heading {
+  color: var(--meste-burgundy);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--meste-step-h2);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.06;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.meste-subheading {
+  color: var(--meste-burgundy);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--meste-step-h3);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.meste-accent {
+  color: var(--meste-burgundy-deep);
+  font-style: italic;
+}
+
+.meste-body-copy {
+  font-size: var(--meste-step-body);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 40rem;
+}
+
+.meste-lede {
+  font-size: var(--meste-step-lede);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 34rem;
+}
+
+.meste-muted {
+  color: var(--meste-muted);
+}
+
+.meste-numeral {
+  color: var(--meste-gold-numeral);
+  font-family: var(--font-display), Georgia, serif;
+  font-feature-settings: 'tnum';
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.meste-numeral--large {
+  font-size: 2.1rem;
+}
+
+/* Dark grounds re-map the ink roles rather than overriding each rule. */
+.meste-section--forest,
+.meste-section--burgundy,
+.meste-footer,
+.meste-on-dark {
+  --meste-rule: rgb(246 240 229 / 22%);
+  --meste-rule-strong: rgb(246 240 229 / 40%);
+  --meste-focus: var(--meste-gold-light);
+}
+
+.meste-section--forest .meste-eyebrow,
+.meste-section--burgundy .meste-eyebrow,
+.meste-footer .meste-eyebrow,
+.meste-on-dark .meste-eyebrow {
+  color: var(--meste-gold-light);
+}
+
+.meste-section--forest .meste-heading,
+.meste-section--forest .meste-subheading,
+.meste-section--forest .meste-display-heading,
+.meste-section--burgundy .meste-heading,
+.meste-section--burgundy .meste-subheading,
+.meste-section--burgundy .meste-display-heading,
+.meste-on-dark .meste-heading,
+.meste-on-dark .meste-subheading {
+  color: var(--meste-ivory);
+}
+
+.meste-section--forest .meste-accent,
+.meste-section--burgundy .meste-accent,
+.meste-on-dark .meste-accent {
+  color: var(--meste-gold-light);
+}
+
+.meste-section--forest .meste-muted,
+.meste-section--burgundy .meste-muted,
+.meste-on-dark .meste-muted {
+  color: rgb(246 240 229 / 78%);
+}
+
+.meste-section--forest .meste-numeral,
+.meste-section--burgundy .meste-numeral,
+.meste-on-dark .meste-numeral {
+  color: var(--meste-gold-light);
+}
+
+.meste-section--forest .meste-index__title,
+.meste-section--burgundy .meste-index__title,
+.meste-on-dark .meste-index__title,
+.meste-section--forest .meste-dish__name,
+.meste-section--burgundy .meste-dish__name {
+  color: var(--meste-ivory);
+}
+
+.meste-section--forest .meste-index__detail,
+.meste-section--burgundy .meste-index__detail,
+.meste-on-dark .meste-index__detail,
+.meste-section--forest .meste-note-row em,
+.meste-section--burgundy .meste-note-row em {
+  color: rgb(246 240 229 / 76%);
+}
+
+.meste-section--forest a.meste-index__row:hover,
+.meste-section--burgundy a.meste-index__row:hover {
+  background: rgb(246 240 229 / 6%);
+}
+
+/* ==========================================================================
+   Rules, ornaments, section headers
+   ========================================================================== */
+
+.meste-rule {
+  background: var(--meste-rule);
+  border: 0;
+  height: 1px;
+  margin: 0;
+  width: 100%;
+}
+
+.kente-divider {
+  background: linear-gradient(
+    90deg,
+    var(--meste-gold) 0 12%,
+    transparent 12% 17%,
+    var(--meste-burgundy) 17% 36%,
+    transparent 36% 41%,
+    var(--meste-forest) 41% 68%,
+    transparent 68% 74%,
+    var(--meste-gold) 74% 100%
+  );
+  height: 0.15rem;
+  opacity: 0.5;
+  width: 100%;
+}
+
+.meste-section-head {
+  align-items: baseline;
+  border-bottom: 1px solid var(--meste-rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 2.5rem;
+  justify-content: space-between;
+  padding-bottom: 1.1rem;
+}
+
+.meste-section-head__title {
+  flex: 1 1 22ch;
+  max-width: 30ch;
+}
+
+.meste-section-head .meste-eyebrow {
+  padding-top: 0.35rem;
+  white-space: nowrap;
+}
+
+.meste-signature-band {
+  align-items: center;
+  background: var(--meste-surface-alt);
+  border-block: 1px solid var(--meste-rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.6rem;
+  justify-content: center;
+  padding-block: 1.15rem;
+}
+
+.meste-signature-band span {
+  color: var(--meste-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+
+.meste-diamond {
+  border: 1px solid var(--meste-gold);
+  display: block;
+  height: 0.3rem;
+  rotate: 45deg;
+  width: 0.3rem;
+}
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+
+.meste-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--meste-burgundy);
+  color: var(--meste-burgundy);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-interface), system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  justify-content: center;
+  letter-spacing: 0.17em;
+  line-height: 1;
+  padding: 1.05rem 1.85rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.meste-button:hover {
+  background: var(--meste-burgundy);
+  color: var(--meste-ivory);
+}
+
+.meste-button--solid {
+  background: var(--meste-burgundy);
+  color: var(--meste-ivory);
+}
+
+.meste-button--solid:hover {
+  background: var(--meste-burgundy-dark);
+}
+
+.meste-button--compact {
+  padding: 0.8rem 1.25rem;
+}
+
+.meste-on-dark .meste-button,
+.meste-section--forest .meste-button,
+.meste-section--burgundy .meste-button {
+  border-color: var(--meste-gold-light);
+  color: var(--meste-gold-light);
+}
+
+.meste-on-dark .meste-button:hover,
+.meste-section--forest .meste-button:hover,
+.meste-section--burgundy .meste-button:hover {
+  background: var(--meste-gold-light);
+  color: var(--meste-burgundy-deep);
+}
+
+.meste-text-link {
+  border-bottom: 1px solid var(--meste-rule-strong);
+  color: var(--meste-muted);
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  padding-block: 1.05rem 0.7rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.meste-text-link:hover {
+  border-color: var(--meste-burgundy);
+  color: var(--meste-burgundy);
+}
+
+.meste-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.1rem;
+}
+
+/* ==========================================================================
+   Image frames and honest placeholders
+   ========================================================================== */
+
+.meste-frame {
+  background: var(--meste-surface-alt);
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.meste-frame img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.meste-frame--portrait {
+  aspect-ratio: 4 / 5;
+}
+
+.meste-frame--landscape {
+  aspect-ratio: 3 / 2;
+}
+
+.meste-frame--square {
+  aspect-ratio: 1 / 1;
+}
+
+.meste-frame--tall {
+  aspect-ratio: 3 / 4;
+}
+
+/* Placeholder: clearly identified, never a fabricated photograph. */
+.meste-placeholder {
+  align-items: flex-start;
+  background:
+    repeating-linear-gradient(135deg, rgb(90 13 24 / 4%) 0 1px, transparent 1px 9px),
+    var(--meste-surface-alt);
+  border: 1px solid var(--meste-rule);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  justify-content: flex-start;
+  padding: 1.15rem;
+}
+
+.meste-placeholder__label {
+  color: var(--meste-gold-ink);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.meste-placeholder__caption {
+  color: var(--meste-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 26ch;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.meste-header {
+  background: var(--meste-surface);
+  border-bottom: 1px solid var(--meste-rule);
+  position: sticky;
+  top: 0;
+  z-index: 60;
+}
+
+.meste-header__inner {
+  align-items: center;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  min-height: 4.75rem;
+}
+
+.meste-brand {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.8rem;
+  text-decoration: none;
+}
+
+.meste-brand__mark {
+  border-radius: 50%;
+  flex: none;
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.meste-brand__name {
+  color: var(--meste-burgundy);
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.meste-brand__descriptor {
+  color: var(--meste-muted);
+  display: block;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  margin-top: 0.28rem;
+  text-transform: uppercase;
+}
+
+.meste-nav {
+  display: flex;
+  gap: 1.65rem;
+}
+
+.meste-nav a {
+  border-bottom: 1px solid transparent;
+  color: var(--meste-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  padding-bottom: 0.2rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.meste-nav a:hover,
+.meste-nav a[aria-current='page'] {
+  border-color: var(--meste-gold);
+  color: var(--meste-burgundy);
+}
+
+.meste-header__aside {
+  align-items: center;
+  display: flex;
+  gap: 1.1rem;
+}
+
+.meste-locale-switch {
+  align-items: center;
+  display: flex;
+  font-size: 0.68rem;
+  font-weight: 700;
+  gap: 0.4rem;
+  letter-spacing: 0.1em;
+}
+
+.meste-locale-switch__current {
+  color: var(--meste-burgundy);
+}
+
+.meste-locale-switch__divider {
+  color: var(--meste-rule-strong);
+}
+
+.meste-locale-switch a,
+.meste-locale-switch__current {
+  display: inline-flex;
+  min-height: 1.5rem;
+  min-width: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.meste-locale-switch a {
+  color: var(--meste-muted);
+  text-decoration: none;
+}
+
+.meste-locale-switch a:hover {
+  color: var(--meste-burgundy);
+}
+
+.meste-header__toggle {
+  background: transparent;
+  border: 1px solid var(--meste-rule-strong);
+  color: var(--meste-burgundy);
+  cursor: pointer;
+  display: none;
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 0.7rem 0.95rem;
+  text-transform: uppercase;
+}
+
+.meste-mobile-nav {
+  background: var(--meste-surface);
+  border-top: 1px solid var(--meste-rule);
+  display: none;
+  inset: auto 0 0 0;
+  padding-block: 1.5rem 2.5rem;
+}
+
+.meste-mobile-nav[data-open='true'] {
+  display: block;
+}
+
+.meste-mobile-nav ul {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.meste-mobile-nav li {
+  border-bottom: 1px solid var(--meste-rule);
+}
+
+.meste-mobile-nav a {
+  color: var(--meste-burgundy);
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.6rem;
+  padding-block: 0.85rem;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+
+.meste-hero {
+  display: grid;
+  gap: clamp(2.25rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+  padding-block: clamp(2.75rem, 5.5vw, 4.5rem) clamp(2.75rem, 5vw, 4rem);
+}
+
+.meste-hero__body {
+  align-self: end;
+  display: grid;
+  gap: clamp(1.35rem, 2.5vw, 2rem);
+}
+
+.meste-hero__meta {
+  align-items: center;
+  color: var(--meste-gold-ink);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.63rem;
+  font-weight: 600;
+  gap: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.meste-hero__meta span[data-rule] {
+  background: var(--meste-gold);
+  display: block;
+  height: 1px;
+  width: 3.25rem;
+}
+
+.meste-hero__figure {
+  align-self: end;
+  position: relative;
+}
+
+.meste-hero__note {
+  background: var(--meste-surface);
+  border: 1px solid var(--meste-rule);
+  bottom: 2rem;
+  left: -2rem;
+  max-width: 16rem;
+  padding: 1rem 1.35rem;
+  position: absolute;
+}
+
+.meste-hero__note-label {
+  color: var(--meste-gold-ink);
+  font-feature-settings: 'tnum';
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.meste-hero__note p {
+  color: var(--meste-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+}
+
+/* ==========================================================================
+   Grids: promise, process, editorial columns
+   ========================================================================== */
+
+.meste-pillars {
+  background: var(--meste-rule);
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 1px;
+}
+
+.meste-pillar {
+  background: var(--meste-surface);
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.85rem 1.5rem 1.75rem;
+}
+
+.meste-pillar__label {
+  color: var(--meste-muted);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.meste-pillar__body {
+  color: var(--meste-muted);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  margin: 0.35rem 0 0;
+}
+
+.meste-manifesto {
+  display: grid;
+  gap: clamp(2rem, 4.5vw, 3.75rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.42fr);
+}
+
+.meste-manifesto__columns {
+  color: var(--meste-muted);
+  column-gap: 2.75rem;
+  column-rule: 1px solid var(--meste-rule);
+  columns: 2;
+  font-size: var(--meste-step-body);
+  line-height: 1.85;
+  margin-top: 1.75rem;
+}
+
+.meste-manifesto__columns p {
+  margin: 0 0 1.1rem;
+}
+
+.meste-manifesto__columns p:last-child {
+  margin-bottom: 0;
+}
+
+.meste-reasons {
+  border-top: 2px solid var(--meste-burgundy);
+  padding-top: 1.1rem;
+}
+
+.meste-reasons ol {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+}
+
+.meste-reasons li {
+  border-bottom: 1px solid var(--meste-rule);
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  padding-block: 0.75rem;
+}
+
+.meste-reasons li:last-child {
+  border-bottom: 0;
+}
+
+.meste-reasons__index {
+  color: var(--meste-gold-ink);
+  font-feature-settings: 'tnum';
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.meste-reasons span:last-child {
+  color: var(--meste-muted);
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Index rows (worlds, fresh, experience)
+   ========================================================================== */
+
+.meste-index {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-index > li {
+  border-bottom: 1px solid var(--meste-rule);
+}
+
+.meste-index__row {
+  align-items: center;
+  color: inherit;
+  display: grid;
+  gap: 0.35rem 1.75rem;
+  grid-template-columns: 3.25rem minmax(0, 0.85fr) minmax(0, 1.15fr) 1.75rem;
+  padding-block: 1.4rem;
+  text-decoration: none;
+  transition: background-color 0.18s ease;
+}
+
+a.meste-index__row:hover {
+  background: var(--meste-surface-alt);
+}
+
+.meste-index__title {
+  color: var(--meste-burgundy);
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.3rem, 1.05rem + 0.75vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.meste-index__detail {
+  color: var(--meste-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.meste-index__arrow {
+  color: var(--meste-gold-ink);
+  font-size: 1.05rem;
+  justify-self: end;
+}
+
+.meste-index--stacked .meste-index__row {
+  align-items: baseline;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+}
+
+.meste-index--stacked .meste-index__detail {
+  margin-top: 0.3rem;
+}
+
+/* ==========================================================================
+   Horizontal rail (reception formats, dishes)
+   ========================================================================== */
+
+.meste-rail {
+  display: grid;
+  gap: 1.25rem;
+  grid-auto-columns: minmax(15.5rem, 1fr);
+  grid-auto-flow: column;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.meste-rail > * {
+  scroll-snap-align: start;
+}
+
+.meste-rail-item__head {
+  align-items: baseline;
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+}
+
+.meste-rail-item__index {
+  color: var(--meste-gold-ink);
+  font-feature-settings: 'tnum';
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.meste-rail-item p {
+  color: var(--meste-muted);
+  font-size: 0.83rem;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0.35rem 0 0;
+}
+
+.meste-rail-item--outline {
+  align-content: center;
+  border: 1px solid var(--meste-rule-strong);
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.5rem;
+}
+
+.meste-dish {
+  display: grid;
+}
+
+.meste-dish__name {
+  color: var(--meste-burgundy);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 0.9rem;
+}
+
+.meste-dish__composition {
+  color: var(--meste-muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin: 0.4rem 0 0;
+}
+
+.meste-dish__level {
+  color: var(--meste-gold-ink);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin-top: 0.55rem;
+  text-transform: uppercase;
+}
+
+.meste-identity {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.meste-identity__item {
+  border-top: 1px solid var(--meste-rule);
+  padding-top: 0.85rem;
+}
+
+.meste-identity__item:first-child {
+  border-top-color: var(--meste-gold);
+}
+
+.meste-identity__item p {
+  color: var(--meste-muted);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin: 0.35rem 0 0;
+}
+
+/* ==========================================================================
+   Split sections (experience, fresh)
+   ========================================================================== */
+
+.meste-split {
+  align-items: start;
+  display: grid;
+  gap: clamp(2rem, 4.5vw, 3.75rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.meste-split--narrow-first {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+}
+
+.meste-note-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.meste-note-row__line {
+  background: var(--meste-rule);
+  flex: 1;
+  height: 1px;
+  min-width: 2rem;
+}
+
+.meste-note-row em {
+  color: var(--meste-muted);
+  font-size: 0.82rem;
+}
+
+/* ==========================================================================
+   Process
+   ========================================================================== */
+
+.meste-process {
+  display: grid;
+  gap: 1.5rem 2rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 2rem;
+}
+
+.meste-process__step {
+  border-top: 1px solid var(--meste-rule);
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 1rem;
+}
+
+.meste-process__step:first-child {
+  border-top-color: var(--meste-gold);
+}
+
+.meste-process__step p {
+  color: var(--meste-muted);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  margin: 0.2rem 0 0;
+}
+
+/* ==========================================================================
+   Editorial empty states (references, testimonials)
+   ========================================================================== */
+
+.meste-empty {
+  border: 1px solid var(--meste-rule);
+  display: grid;
+  gap: 0.9rem;
+  padding: clamp(1.75rem, 3.5vw, 2.75rem);
+}
+
+.meste-empty p {
+  color: var(--meste-muted);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  margin: 0;
+  max-width: 46ch;
+}
+
+.meste-quote-grid {
+  display: grid;
+  gap: 2rem 3rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.meste-quote {
+  border-top: 1px solid var(--meste-rule);
+  display: grid;
+  gap: 1rem;
+  padding-top: 1.35rem;
+}
+
+.meste-quote:first-child {
+  border-top-color: var(--meste-gold);
+}
+
+.meste-quote blockquote {
+  color: var(--meste-burgundy-deep);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.meste-quote figcaption {
+  color: var(--meste-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Closing statement
+   ========================================================================== */
+
+.meste-closing {
+  border-block: 1px solid var(--meste-rule);
+  text-align: center;
+}
+
+.meste-closing__rule {
+  align-items: center;
+  margin: 0;
+  color: var(--meste-gold-ink);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.62rem;
+  font-weight: 600;
+  gap: 1rem;
+  justify-content: center;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.meste-closing__rule span[data-rule] {
+  background: var(--meste-gold);
+  display: block;
+  height: 1px;
+  width: clamp(2rem, 6vw, 4.5rem);
+}
+
+.meste-closing__wordmark {
+  -webkit-text-stroke: 1.2px var(--meste-gold-numeral);
+  color: transparent;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(4.5rem, 15vw, 13rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 0.86;
+  margin: clamp(1rem, 2.5vw, 1.5rem) 0 0;
+}
+
+.meste-closing__line {
+  color: var(--meste-burgundy-deep);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.75rem, 1rem + 3vw, 3rem);
+  font-style: italic;
+  line-height: 1.15;
+  margin: 0.25rem 0 0;
+}
+
+.meste-closing__copy {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.8;
+  margin: 1.5rem auto 0;
+  max-width: 38rem;
+}
+
+.meste-closing .meste-actions {
+  justify-content: center;
+  margin-top: 1.75rem;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.meste-footer {
+  background: var(--meste-forest);
+  color: var(--meste-ivory);
+}
+
+.meste-footer__top {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 1.1fr) repeat(3, minmax(0, 1fr));
+  padding-block: clamp(2.75rem, 5vw, 4rem);
+}
+
+.meste-footer__statement {
+  color: rgb(246 240 229 / 82%);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin: 1rem 0 0;
+  max-width: 26ch;
+}
+
+.meste-footer__column h2 {
+  color: var(--meste-gold-light);
+  font-family: var(--font-interface), system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}
+
+.meste-footer__column ul {
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-footer__column a,
+.meste-footer__column li {
+  color: rgb(246 240 229 / 80%);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.meste-footer__column a {
+  display: inline-block;
+  min-height: 1.5rem;
+  padding-block: 0.2rem;
+}
+
+.meste-footer__column a:hover {
+  color: var(--meste-gold-light);
+}
+
+.meste-footer__bar {
+  align-items: center;
+  background: var(--meste-burgundy-deep);
+  color: rgb(246 240 229 / 60%);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.66rem;
+  gap: 0.6rem 1.5rem;
+  justify-content: space-between;
+  letter-spacing: 0.12em;
+  padding-block: 1.2rem;
+  text-transform: uppercase;
+}
+
+.meste-footer__bar strong {
+  color: var(--meste-gold-light);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Preview banner and error canvas (unchanged behaviour)
+   ========================================================================== */
+
 .preview-banner {
   align-items: center;
   background: var(--meste-black);
   color: var(--meste-ivory);
   display: flex;
-  font-family: var(--font-interface);
   font-size: 0.75rem;
   font-weight: 700;
   gap: 1rem;
@@ -63,228 +1293,12 @@ body {
 .preview-banner button {
   background: transparent;
   border: 0;
-  color: var(--meste-gold);
+  color: var(--meste-gold-light);
   cursor: pointer;
   font: inherit;
   padding: 0;
   text-decoration: underline;
   text-underline-offset: 0.2em;
-}
-
-::selection {
-  background: var(--meste-burgundy);
-  color: var(--meste-ivory);
-}
-
-a {
-  color: inherit;
-}
-
-:focus-visible {
-  outline: 2px solid var(--meste-focus);
-  outline-offset: 4px;
-}
-
-.meste-container {
-  margin-inline: auto;
-  max-width: var(--meste-container);
-  padding-inline: var(--meste-page-gutter);
-  width: 100%;
-}
-
-.meste-eyebrow {
-  color: var(--meste-burgundy);
-  font-size: 0.69rem;
-  font-weight: 700;
-  letter-spacing: 0.19em;
-  line-height: 1.5;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.meste-display-heading {
-  color: var(--meste-burgundy);
-  font-family: var(--font-display), serif;
-  font-size: clamp(3.4rem, 9vw, 9.5rem);
-  font-weight: 500;
-  letter-spacing: -0.055em;
-  line-height: 0.82;
-  margin: 0;
-  max-width: 8ch;
-  text-wrap: balance;
-}
-
-.meste-body-copy {
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
-  line-height: 1.75;
-  margin: 0;
-  max-width: 38rem;
-}
-
-.brand-wordmark {
-  display: inline-flex;
-  flex-direction: column;
-  text-decoration: none;
-}
-
-.brand-wordmark--burgundy {
-  color: var(--meste-burgundy);
-}
-
-.brand-wordmark--forest {
-  color: var(--meste-forest);
-}
-
-.brand-wordmark--ivory {
-  color: var(--meste-ivory);
-}
-
-.brand-wordmark__name {
-  font-family: var(--font-display), serif;
-  font-size: 1.45rem;
-  font-weight: 600;
-  letter-spacing: 0.025em;
-  line-height: 0.9;
-  text-transform: uppercase;
-}
-
-.brand-wordmark__descriptor {
-  font-size: 0.48rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  margin-top: 0.48rem;
-  text-transform: uppercase;
-}
-
-.kente-divider {
-  background: linear-gradient(
-    90deg,
-    var(--meste-gold) 0 12%,
-    transparent 12% 17%,
-    var(--meste-burgundy) 17% 36%,
-    transparent 36% 41%,
-    var(--meste-forest) 41% 68%,
-    transparent 68% 74%,
-    var(--meste-gold) 74% 100%
-  );
-  height: 0.22rem;
-  opacity: 0.35;
-  width: 100%;
-}
-
-.foundation-canvas {
-  background:
-    linear-gradient(90deg, transparent 0 67%, rgb(23 61 39 / 4%) 67% 100%), var(--meste-ivory);
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: 100svh;
-  overflow: clip;
-}
-
-.foundation-header {
-  border-bottom: 1px solid var(--meste-border);
-}
-
-.foundation-header__inner {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  min-height: 6.25rem;
-}
-
-.language-link {
-  color: var(--meste-forest);
-  font-size: 0.67rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  padding-block: 0.5rem;
-  text-decoration-color: rgb(23 61 39 / 35%);
-  text-underline-offset: 0.38rem;
-  text-transform: uppercase;
-}
-
-.language-link:hover {
-  text-decoration-color: currentColor;
-}
-
-.foundation-main {
-  display: flex;
-}
-
-.foundation-composition {
-  align-items: stretch;
-  display: grid;
-  grid-template-columns: minmax(0, 0.7fr) minmax(22rem, 2.5fr) minmax(10rem, 0.7fr);
-  min-height: 39rem;
-}
-
-.foundation-composition__index {
-  align-items: flex-start;
-  border-right: 1px solid var(--meste-border);
-  color: rgb(90 13 24 / 42%);
-  display: flex;
-  font-size: 0.62rem;
-  font-weight: 700;
-  justify-content: center;
-  letter-spacing: 0.38em;
-  padding-top: clamp(4rem, 9vh, 8rem);
-  writing-mode: vertical-rl;
-}
-
-.foundation-composition__content {
-  align-content: center;
-  display: grid;
-  gap: clamp(1.6rem, 4vh, 3.25rem);
-  padding: clamp(4rem, 10vh, 8rem) clamp(2rem, 7vw, 7rem);
-}
-
-.foundation-composition__status {
-  align-items: center;
-  border-top: 1px solid var(--meste-border);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: 0.7rem;
-  font-weight: 700;
-  gap: 1rem 3rem;
-  justify-content: space-between;
-  letter-spacing: 0.11em;
-  padding-top: 1rem;
-  text-transform: uppercase;
-}
-
-.foundation-composition__location {
-  color: var(--meste-forest);
-}
-
-.foundation-composition__signature {
-  align-items: stretch;
-  border-left: 1px solid var(--meste-border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(4rem, 9vh, 8rem) 1.8rem;
-}
-
-.foundation-composition__signature p {
-  color: var(--meste-forest);
-  font-family: var(--font-display), serif;
-  font-size: 1rem;
-  letter-spacing: 0.07em;
-  margin: 0;
-  writing-mode: vertical-rl;
-}
-
-.foundation-footer {
-  background: var(--meste-forest);
-  color: var(--meste-ivory);
-}
-
-.foundation-footer p {
-  font-family: var(--font-display), serif;
-  font-size: clamp(1.05rem, 2vw, 1.35rem);
-  letter-spacing: 0.02em;
-  margin: 0;
-  padding-block: 1.5rem;
 }
 
 .error-canvas {
@@ -305,13 +1319,13 @@ a {
 }
 
 .error-canvas h1 {
-  font-family: var(--font-display), serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(3.2rem, 9vw, 8rem);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
   margin: 1.5rem 0;
-  max-width: 10ch;
+  max-width: 12ch;
 }
 
 .error-canvas p {
@@ -323,86 +1337,123 @@ a {
 .error-canvas button {
   background: transparent;
   border: 1px solid rgb(246 240 229 / 55%);
-  border-radius: 0.2rem;
   color: inherit;
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   margin-top: 1rem;
-  padding: 0.9rem 1.15rem;
+  padding: 0.95rem 1.3rem;
   text-decoration: none;
   text-transform: uppercase;
 }
 
-@media (max-width: 56rem) {
-  .foundation-canvas {
-    background: var(--meste-ivory);
-  }
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
 
-  .foundation-composition {
-    grid-template-columns: 2.75rem minmax(0, 1fr);
-  }
-
-  .foundation-composition__content {
-    padding-inline: clamp(1.5rem, 7vw, 4rem) 0;
-  }
-
-  .foundation-composition__signature {
-    border-left: 0;
-    grid-column: 2;
-    padding: 0 0 3rem clamp(1.5rem, 7vw, 4rem);
-  }
-
-  .foundation-composition__signature p {
-    margin-top: 1rem;
-    writing-mode: initial;
-  }
-}
-
-@media (max-width: 38rem) {
-  .foundation-header__inner {
-    min-height: 5.25rem;
-  }
-
-  .brand-wordmark__descriptor {
+@media (max-width: 68rem) {
+  .meste-nav {
     display: none;
   }
 
-  .language-link {
-    font-size: 0;
+  .meste-header__toggle {
+    display: inline-flex;
   }
 
-  .language-link::after {
-    content: attr(hreflang);
-    font-size: 0.7rem;
+  .meste-hero {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .foundation-composition {
-    grid-template-columns: 1.5rem minmax(0, 1fr);
+  .meste-hero__figure {
+    max-width: 30rem;
   }
 
-  .foundation-composition__index {
-    font-size: 0.55rem;
-    justify-content: flex-start;
-    padding-top: 3rem;
+  .meste-hero__note {
+    left: auto;
+    right: -1rem;
   }
 
-  .foundation-composition__content {
-    gap: 1.65rem;
-    padding-block: 3.5rem;
+  .meste-manifesto,
+  .meste-split,
+  .meste-split--narrow-first {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .meste-display-heading {
-    font-size: clamp(3.55rem, 19vw, 5.6rem);
-    line-height: 0.86;
+  .meste-pillars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .foundation-composition__status {
-    align-items: flex-start;
-    flex-direction: column;
+  .meste-process {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .meste-quote-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meste-footer__top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 44rem) {
+  .meste-brand__descriptor {
+    display: none;
+  }
+
+  .meste-header__cta {
+    display: none;
+  }
+
+  .meste-manifesto__columns {
+    column-rule: 0;
+    columns: 1;
+  }
+
+  .meste-pillars {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meste-process {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .meste-index__row {
+    align-items: baseline;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem;
+  }
+
+  .meste-index__detail {
+    grid-column: 2;
+    margin-top: 0.3rem;
+  }
+
+  .meste-index__arrow {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .meste-hero__note {
+    bottom: auto;
+    margin-top: 1rem;
+    max-width: none;
+    position: static;
+  }
+
+  .meste-hero__figure {
+    max-width: none;
+  }
+
+  .meste-footer__top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meste-signature-band span {
+    font-size: 0.64rem;
+    letter-spacing: 0.28em;
   }
 }
 

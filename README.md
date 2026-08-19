@@ -9,9 +9,14 @@ The repository is intentionally integrated: the bilingual Next.js public site, P
 - Phase 1 — discovery and implementation plan: complete
 - Phase 2 — technical and visual foundation: complete
 - Phase 3 — full CMS content model: implementation complete
-- Phase 4 — complete homepage: not started
+- Phase 4 — complete homepage: implementation complete, pending local verification
 
-The current `/en` and `/fr` pages are a foundation canvas, not the final homepage. Official logo files and photography have not been supplied, so the project does not fabricate them.
+`/en` and `/fr` now render the full homepage journey. The official logo and
+medallion supplied by the client live in `public/brand`. Photography has not
+been supplied, so every image frame renders a clearly labelled placeholder
+naming the shoot it is waiting for — nothing is fabricated.
+
+See [Homepage composition](docs/HOMEPAGE.md).
 
 ## Stack
 
@@ -94,7 +99,12 @@ R2 is optional locally and mandatory in the Netlify production context. Resend a
 ```text
 src/app/(frontend)/[locale]  localized public root
 src/app/(payload)            Payload admin and APIs
-src/components               brand, editorial, and UI primitives
+src/components/home          homepage sections (pure, content-driven)
+src/components/layout        header, footer, official brand marks
+src/components/ui            design-system primitives
+src/lib/home                 homepage content contract and approved EN/FR copy
+src/lib/site                 header/footer/contact contract
+src/lib/routes.ts            localized route map for every planned page
 src/collections              full editorial, redirect, user, and private-operation schemas
 src/globals                  controlled site-wide CMS documents
 src/blocks                   constrained editorial block definitions
@@ -125,9 +135,12 @@ Do not use Payload development schema push against preview or production. Starti
 
 ## Known foundation limits
 
-- Official logo and portrait-mark files are missing.
-- Real photography is missing.
+- Real photography is missing; image frames render labelled placeholders.
+- Only the phone number published in the 2026 presentation is public. Address,
+  email, opening hours, social handles and the international WhatsApp number are
+  empty CMS fields and stay hidden until MESTE supplies them.
+- No testimonial, client reference or price appears anywhere on the site.
 - PostgreSQL-backed integration and authenticated-admin browser tests are configured in CI but require a local development database to run on a workstation.
 - The complete Payload collections/globals/roles/localization model belongs to Phase 3.
-- The final homepage visual journey belongs to Phase 4.
+- Core pages beyond the homepage belong to Phase 5.
 - Forms, email, Sentry, complete SEO, and production hardening belong to later phases.

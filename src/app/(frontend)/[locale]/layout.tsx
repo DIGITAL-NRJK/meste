@@ -3,10 +3,10 @@ import { draftMode } from 'next/headers'
 import type { ReactNode } from 'react'
 
 import { PreviewBanner } from '@/components/editorial/PreviewBanner'
+import { getPublicSiteURL } from '@/lib/env/public'
 import { displayFont, interfaceFont } from '@/lib/fonts'
 import { defaultLocale, isLocale } from '@/lib/i18n/config'
-import { getFoundationDictionary } from '@/lib/i18n/dictionaries'
-import { getPublicSiteURL } from '@/lib/env/public'
+import { getSiteDictionary } from '@/lib/i18n/site'
 
 import '../styles.css'
 
@@ -18,7 +18,7 @@ type LocaleLayoutProps = {
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
   const { locale: requestedLocale } = await params
   const locale = isLocale(requestedLocale) ? requestedLocale : defaultLocale
-  const copy = getFoundationDictionary(locale)
+  const copy = getSiteDictionary(locale)
   const { isEnabled: isPreview } = await draftMode()
 
   return {
@@ -30,12 +30,12 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         'x-default': '/en',
       },
     },
-    description: copy.body,
+    description: copy.defaultDescription,
     metadataBase: getPublicSiteURL(),
     robots: isPreview ? { follow: false, index: false } : undefined,
     title: {
-      default: `MESTE — ${copy.headline}`,
-      template: '%s — MESTE',
+      default: copy.defaultTitle,
+      template: copy.titleTemplate,
     },
   }
 }

@@ -1,22 +1,34 @@
-import type { HTMLAttributes } from 'react'
+import Image from 'next/image'
 
-type LogoFullProps = HTMLAttributes<HTMLSpanElement> & {
-  tone?: 'burgundy' | 'forest' | 'ivory'
+import logo from '../../../public/brand/meste-logo-full.png'
+
+type LogoFullProps = {
+  className?: string
+  priority?: boolean
+  /** Accessible name. Pass an empty string when a visible wordmark sits beside it. */
+  label?: string
+  width?: number
 }
 
 /**
- * Text-only fallback. Replace the inner treatment only after official logo files are supplied.
- * This deliberately does not reproduce or approximate the Mama Emma portrait.
+ * The complete official logo lockup (medallion plus wordmark) as supplied by
+ * the client. Reserved for large brand moments; the header uses LogoMark with
+ * live text so the wordmark stays selectable and scalable.
  */
-export function LogoFull({ className = '', tone = 'burgundy', ...props }: LogoFullProps) {
+export function LogoFull({
+  className = '',
+  label = 'Mama Emma Service Traiteur d’Excellence',
+  priority = false,
+  width = 240,
+}: LogoFullProps) {
   return (
-    <span
-      className={`brand-wordmark brand-wordmark--${tone} ${className}`.trim()}
-      data-logo-status="official-asset-pending"
-      {...props}
-    >
-      <span className="brand-wordmark__name">Mama Emma</span>
-      <span className="brand-wordmark__descriptor">Service Traiteur d&apos;Excellence</span>
-    </span>
+    <Image
+      alt={label}
+      className={className}
+      height={width}
+      priority={priority}
+      src={logo}
+      width={width}
+    />
   )
 }

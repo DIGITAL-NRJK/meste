@@ -6,6 +6,7 @@ import {
   authenticated,
   getUserRole,
   permittedPublishedOrAuthenticated,
+  publishedConfigOrAuthenticated,
   publishedOrAuthenticated,
 } from '@/collections/access/roles'
 
@@ -63,6 +64,22 @@ describe('CMS access policies', () => {
       _status: { equals: 'published' },
       'localeReadiness.en': { equals: true },
     })
+  })
+
+  /**
+   * Configuration documents have no `localeReadiness` field. Filtering on it
+   * makes Payload reject the whole read, which is how the site silently lost
+   * its CMS header, footer and contact details.
+   */
+  it('never filters configuration documents on locale readiness', async () => {
+    expect(await publishedConfigOrAuthenticated(accessArgs('editor'))).toBe(true)
+
+    for (const locale of [undefined, 'fr', 'de']) {
+      const constraint = await publishedConfigOrAuthenticated(accessArgs(undefined, locale))
+
+      expect(constraint).toEqual({ _status: { equals: 'published' } })
+      expect(JSON.stringify(constraint)).not.toContain('localeReadiness')
+    }
   })
 
   it('requires both publication and display permission for public social proof', async () => {
