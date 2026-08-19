@@ -99,7 +99,31 @@ test.describe('interior pages', () => {
   })
 
   test('returns the branded not-found state for a page that is not built yet', async ({ page }) => {
-    const response = await page.goto('/en/services')
+    const response = await page.goto('/en/gallery')
     expect(response?.status()).toBe(404)
+  })
+
+  test('serves the services index with its four worlds', async ({ page }) => {
+    await page.goto('/en/services')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('One house')
+    await expect(page.locator('.meste-world-row')).toHaveCount(4)
+    await expect(page.getByText('References available on request')).toBeVisible()
+  })
+
+  test('serves the menu collection without a single price', async ({ page }) => {
+    await page.goto('/en/menus')
+    await expect(page.locator('.meste-dish')).toHaveCount(12)
+
+    const body = (await page.locator('body').innerText()).toLowerCase()
+    expect(body).not.toMatch(/gh[₵s]|\busd\b|€|\$\d/)
+  })
+
+  test('serves Mama Emma Fresh with no unverified claim', async ({ page }) => {
+    await page.goto('/en/mama-emma-fresh')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('into the glass')
+    await expect(page.locator('.meste-product')).toHaveCount(6)
+
+    const body = (await page.locator('body').innerText()).toLowerCase()
+    expect(body).not.toContain('organic')
   })
 })

@@ -2,12 +2,32 @@ import { menuFamilies } from '@/collections/MenuCategories'
 import type { culinaryLevels } from '@/collections/MenuItems'
 import { serviceCategories } from '@/collections/Services'
 
+/**
+ * Family names exactly as the approved menu collection writes them, rather than
+ * capitalised slugs. Typing the map against `menuFamilies` means adding a
+ * family to the schema without naming it here fails the build instead of
+ * quietly seeding a label nobody approved.
+ *
+ * These are the English values; the field is localized and the French names are
+ * an editorial decision, so the seed leaves that locale to an editor.
+ */
+const menuCategoryNames: Record<(typeof menuFamilies)[number], string> = {
+  'cocktail-classics': 'Cocktail Classics',
+  'meste-signature-cocktails': 'MESTE Signature Cocktails',
+  'chef-cocktail-creations': 'Chef’s Cocktail Creations',
+  starters: 'Starters — Fresh & Elegant',
+  'heritage-african-roots': 'Heritage & African Roots',
+  'fish-seafood': 'Fish & Seafood',
+  poultry: 'Poultry',
+  meat: 'Meat',
+  'vegetable-table': 'The Vegetable Table',
+  sides: 'Signature Sides',
+  desserts: 'Sweet Mama Emma',
+}
+
 export const menuCategorySeed = menuFamilies.map((family, index) => ({
   family,
-  name: family
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' '),
+  name: menuCategoryNames[family],
   seedKey: `menu-category:${family}`,
   slug: family,
   sortOrder: (index + 1) * 10,

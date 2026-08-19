@@ -1604,6 +1604,28 @@ html[data-entered='true'] .meste-entry {
   .meste-page-opening__aside {
     padding-top: 2.6rem;
   }
+
+  /* With no companion beside it, the opening sets the lede next to the
+     headline instead of leaving the right half of the band empty. */
+  .meste-page-opening__copy[data-wide] {
+    align-items: end;
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+
+  .meste-page-opening__copy[data-wide] > .meste-eyebrow {
+    grid-column: 1 / -1;
+  }
+
+  .meste-page-opening__copy[data-wide] .meste-page-opening__title {
+    max-width: 18ch;
+  }
+
+  .meste-page-opening__copy[data-wide] .meste-page-opening__lede {
+    margin-top: 0;
+    padding-bottom: 0.75rem;
+  }
 }
 
 /* Chapters ---------------------------------------------------------------- */
@@ -1834,6 +1856,408 @@ html[data-entered='true'] .meste-entry {
 
 .meste-page-closing .meste-actions {
   justify-content: center;
+}
+
+/* ==========================================================================
+   Services, menus and Mama Emma Fresh
+   ========================================================================== */
+
+.meste-worlds-rows {
+  display: grid;
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+.meste-world-row {
+  border-top: 1px solid var(--meste-rule);
+  display: grid;
+  gap: 0.5rem 2rem;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: clamp(1.4rem, 3vw, 2.1rem);
+}
+
+.meste-world-row__index {
+  color: var(--meste-gold-numeral);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  margin: 0;
+}
+
+.meste-world-row__title {
+  margin: 0;
+}
+
+.meste-world-row__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-world-row__items li {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  position: relative;
+}
+
+.meste-world-row__items li + li::before {
+  color: var(--meste-gold);
+  content: '·';
+  left: -0.85rem;
+  position: absolute;
+}
+
+@media (min-width: 60rem) {
+  .meste-world-row {
+    grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 1.35fr);
+  }
+}
+
+/* Reception formats ------------------------------------------------------- */
+
+.meste-formats-note {
+  color: var(--meste-muted);
+  margin: 1.75rem 0 0;
+  max-width: 52ch;
+}
+
+.meste-format-list {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+/* A format with no photography keeps its name on the same baseline as the
+   others rather than floating at the top of the row. */
+.meste-format {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.meste-format__name {
+  font-size: var(--meste-step-h3);
+  margin: 1rem 0 0.4rem;
+}
+
+.meste-format__description {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* References empty state -------------------------------------------------- */
+
+.meste-references-note {
+  border-left: 2px solid var(--meste-gold);
+  padding-left: clamp(1.25rem, 3vw, 2rem);
+}
+
+.meste-references-note__title {
+  font-size: var(--meste-step-h3);
+  margin: 0.7rem 0 0;
+}
+
+.meste-references-note__body {
+  color: var(--meste-muted);
+  margin: 0.9rem 0 0;
+  max-width: 58ch;
+}
+
+/* Culinary levels --------------------------------------------------------- */
+
+.meste-levels {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+.meste-level {
+  border-top: 1px solid var(--meste-rule-strong);
+  padding-top: 1.25rem;
+}
+
+.meste-level__name {
+  font-size: var(--meste-step-h3);
+  margin: 0 0 0.75rem;
+}
+
+.meste-level__body {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.meste-level__list {
+  display: grid;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+}
+
+.meste-level__list li {
+  border-left: 1px solid var(--meste-gold);
+  font-size: var(--meste-step-body);
+  padding-left: 0.8rem;
+}
+
+/* Signature dishes -------------------------------------------------------- */
+
+.meste-dishes-intro {
+  color: var(--meste-muted);
+  margin: 1.75rem 0 0;
+  max-width: 52ch;
+}
+
+.meste-dishes {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+.meste-dish {
+  align-items: baseline;
+  border-top: 1px solid var(--meste-rule);
+  display: flex;
+  gap: 1.25rem;
+  padding-block: 1.15rem;
+}
+
+/* Small gold text takes the ink role: the display numeral colour only clears
+   contrast at 24px and above. */
+.meste-dish__index {
+  color: var(--meste-gold-ink);
+  flex: none;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  width: 2rem;
+}
+
+.meste-dish__name {
+  font-size: var(--meste-step-lede);
+  margin: 0;
+}
+
+.meste-dish__composition {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.55;
+  margin: 0.3rem 0 0;
+  max-width: 62ch;
+}
+
+@media (min-width: 64rem) {
+  .meste-dishes {
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Menu families ----------------------------------------------------------- */
+
+.meste-families {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.meste-family {
+  border-top: 1px solid var(--meste-rule-strong);
+  padding-top: 1.25rem;
+}
+
+.meste-family__name {
+  font-size: var(--meste-step-h3);
+  margin: 0;
+}
+
+.meste-family__note {
+  color: var(--meste-gold-ink);
+  font-size: var(--meste-step-body);
+  line-height: 1.55;
+  margin: 0.75rem 0 0;
+}
+
+.meste-family__dishes {
+  display: grid;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.meste-family__dishes li {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.45;
+}
+
+/* Signature menus --------------------------------------------------------- */
+
+.meste-signature-menus__title {
+  color: var(--meste-ivory);
+  margin: 1rem 0 0;
+  max-width: 18ch;
+}
+
+.meste-signature-menus__list {
+  counter-reset: menu;
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+.meste-signature-menus__list li {
+  border-top: 1px solid var(--meste-rule);
+  counter-increment: menu;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.6rem);
+  line-height: 1.2;
+  padding-block: clamp(0.85rem, 2vw, 1.35rem);
+}
+
+.meste-signature-menus__list li::before {
+  color: var(--meste-gold-light);
+  content: counter(menu, decimal-leading-zero);
+  display: inline-block;
+  font-size: var(--meste-step-eyebrow);
+  letter-spacing: 0.2em;
+  margin-right: 1.25rem;
+  vertical-align: middle;
+}
+
+.meste-signature-menus__note {
+  color: var(--meste-ivory);
+  font-size: var(--meste-step-body);
+  margin: 2rem 0 0;
+  max-width: 52ch;
+  opacity: 0.85;
+}
+
+/* Mama Emma Fresh --------------------------------------------------------- */
+
+.meste-products {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+.meste-product {
+  align-items: baseline;
+  border-top: 1px solid var(--meste-rule);
+  display: flex;
+  gap: 1.25rem;
+  padding-block: 1.1rem;
+}
+
+.meste-product__index {
+  color: var(--meste-gold-numeral);
+  font-family: var(--font-display), Georgia, serif;
+  /* Above the 24px threshold, so the display numeral colour is legitimate. */
+  font-size: 1.6rem;
+  line-height: 1;
+  width: 2.5rem;
+}
+
+.meste-product__name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 2rem);
+  line-height: 1.2;
+}
+
+.meste-products__signature {
+  color: var(--meste-gold-ink);
+  font-size: var(--meste-step-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  margin: 2rem 0 0;
+  text-transform: uppercase;
+}
+
+.meste-products__note {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  margin: 0.75rem 0 0;
+  max-width: 52ch;
+}
+
+@media (min-width: 60rem) {
+  .meste-products {
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Fresh in the kitchen ---------------------------------------------------- */
+
+.meste-uses-intro {
+  color: var(--meste-muted);
+  margin: 1.75rem 0 0;
+  max-width: 52ch;
+}
+
+.meste-uses {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+}
+
+.meste-use {
+  border-top: 1px solid var(--meste-rule-strong);
+  padding-top: 1.1rem;
+}
+
+.meste-use dt {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--meste-step-h3);
+}
+
+.meste-use dd {
+  margin: 0.85rem 0 0;
+}
+
+.meste-use ul {
+  display: grid;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-use li {
+  border-left: 1px solid var(--meste-gold);
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  padding-left: 0.8rem;
+}
+
+.meste-uses__caveat {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  margin: 2rem 0 0;
+  max-width: 52ch;
 }
 
 @media (prefers-reduced-motion: reduce) {

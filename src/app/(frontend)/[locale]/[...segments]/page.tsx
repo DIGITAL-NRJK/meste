@@ -3,11 +3,18 @@ import { notFound } from 'next/navigation'
 
 import { AboutComposition } from '@/components/about/AboutComposition'
 import { ContactComposition } from '@/components/contact/ContactComposition'
+import { FreshComposition } from '@/components/fresh/FreshComposition'
+import { MenusComposition } from '@/components/menus/MenusComposition'
+import { ServicesComposition } from '@/components/services/ServicesComposition'
 import { isLocale, locales, type Locale } from '@/lib/i18n/config'
 import { formatPageTitle } from '@/lib/i18n/site'
+import type { PageMeta } from '@/lib/pages/types'
 import { getAboutContent } from '@/lib/payload/queries/about'
 import { getSiteChrome } from '@/lib/payload/queries/chrome'
 import { getContactContent } from '@/lib/payload/queries/contact'
+import { getFreshContent } from '@/lib/payload/queries/freshPage'
+import { getMenusContent } from '@/lib/payload/queries/menusPage'
+import { getServicesContent } from '@/lib/payload/queries/servicesPage'
 import { resolveRouteFromSegments, routePath, type RouteKey } from '@/lib/routes'
 
 type InteriorPageProps = {
@@ -19,7 +26,7 @@ type InteriorPageProps = {
  * manifest but is not listed here returns the branded 404 rather than an empty
  * shell — an unfinished page is never published as if it were finished.
  */
-const buildableRoutes = ['about', 'contact'] as const
+const buildableRoutes = ['about', 'services', 'menus', 'fresh', 'contact'] as const
 
 type BuildableRoute = (typeof buildableRoutes)[number]
 
@@ -36,8 +43,12 @@ function resolve(locale: string, segments: string[]): BuildableRoute | null {
   return route && isBuildable(route) ? route : null
 }
 
-function getMeta(route: BuildableRoute, locale: Locale) {
-  return route === 'about' ? getAboutContent(locale) : getContactContent(locale)
+const loaders: Record<BuildableRoute, (locale: Locale) => Promise<{ meta: PageMeta }>> = {
+  about: getAboutContent,
+  contact: getContactContent,
+  fresh: getFreshContent,
+  menus: getMenusContent,
+  services: getServicesContent,
 }
 
 export function generateStaticParams() {
@@ -58,7 +69,7 @@ export async function generateMetadata({ params }: InteriorPageProps): Promise<M
     return {}
   }
 
-  const content = await getMeta(route, locale)
+  const content = await loaders[route](locale)
 
   return {
     alternates: {
@@ -82,11 +93,36 @@ export default async function InteriorPage({ params }: InteriorPageProps) {
     notFound()
   }
 
-  if (route === 'about') {
-    const [content, chrome] = await Promise.all([getAboutContent(locale), getSiteChrome(locale)])
-    return <AboutComposition chrome={chrome} content={content} locale={locale} />
-  }
+  const chrome = await getSiteChrome(locale)
 
-  const [content, chrome] = await Promise.all([getContactContent(locale), getSiteChrome(locale)])
-  return <ContactComposition chrome={chrome} content={content} locale={locale} />
+  switch (route) {
+    case 'about':
+      return (
+        <AboutComposition chrome={chrome} content={await getAboutContent(locale)} locale={locale} />
+      )
+    case 'services':
+      return (
+        <ServicesComposition
+          chrome={chrome}
+          content={await getServicesContent(locale)}
+          locale={locale}
+        />
+      )
+    case 'menus':
+      return (
+        <MenusComposition chrome={chrome} content={await getMenusContent(locale)} locale={locale} />
+      )
+    case 'fresh':
+      return (
+        <FreshComposition chrome={chrome} content={await getFreshContent(locale)} locale={locale} />
+      )
+    case 'contact':
+      return (
+        <ContactComposition
+          chrome={chrome}
+          content={await getContactContent(locale)}
+          locale={locale}
+        />
+      )
+  }
 }
