@@ -64,6 +64,49 @@ describe('homepage baseline', () => {
   })
 })
 
+describe('site navigation', () => {
+  /**
+   * The contact page shipped before anything linked to it. A page reachable
+   * only by typing its URL is not published, it is hidden.
+   */
+  it('reaches every built page from the header', () => {
+    for (const locale of locales) {
+      const routes = getChromeBaseline(locale).nav.map((item) => item.route)
+
+      expect(routes).toEqual([
+        'about',
+        'services',
+        'menus',
+        'fresh',
+        'gallery',
+        'experience',
+        'contact',
+      ])
+    }
+  })
+
+  /**
+   * Asking for a proposal and asking a question are different intentions. The
+   * quote stays the promoted call to action; contact is the quieter path, and
+   * the footer carries it.
+   *
+   * The footer deliberately does not link to the quote route yet: that page
+   * does not exist, and a navigation link to a 404 is worse than no link.
+   */
+  it('carries contact in the footer, and no link to an unbuilt page', () => {
+    for (const locale of locales) {
+      const chrome = getChromeBaseline(locale)
+      const footerRoutes = chrome.footer.columns.flatMap((column) =>
+        column.items.map((item) => item.route),
+      )
+
+      expect(footerRoutes).toContain('contact')
+      expect(footerRoutes).not.toContain('quote')
+      expect(chrome.primaryAction.route).toBe('quote')
+    }
+  })
+})
+
 describe('contact chrome', () => {
   it('exposes only the published phone number and nothing invented', () => {
     for (const locale of locales) {

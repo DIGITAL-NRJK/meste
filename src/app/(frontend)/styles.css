@@ -646,17 +646,65 @@ img {
 }
 
 .meste-header__toggle {
+  align-items: center;
   background: transparent;
   border: 1px solid var(--meste-rule-strong);
   color: var(--meste-burgundy);
   cursor: pointer;
   display: none;
-  font-family: inherit;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  padding: 0.7rem 0.95rem;
-  text-transform: uppercase;
+  /* Comfortably past the 24px minimum target the rest of the site holds to. */
+  height: 2.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 2.75rem;
+}
+
+/* Three hairlines, in the same weight as the rules that run across the site.
+   They fold into a cross when the panel opens; the global reduced-motion rule
+   removes the transition. */
+.meste-burger {
+  display: block;
+  height: 1px;
+  position: relative;
+  width: 1.15rem;
+}
+
+.meste-burger,
+.meste-burger::before,
+.meste-burger::after {
+  background: var(--meste-burgundy);
+  transition:
+    background-color 160ms ease,
+    transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.meste-burger::before,
+.meste-burger::after {
+  content: '';
+  height: 1px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.meste-burger::before {
+  transform: translateY(-0.36rem);
+}
+
+.meste-burger::after {
+  transform: translateY(0.36rem);
+}
+
+[aria-expanded='true'] > .meste-burger {
+  background: transparent;
+}
+
+[aria-expanded='true'] > .meste-burger::before {
+  transform: rotate(45deg);
+}
+
+[aria-expanded='true'] > .meste-burger::after {
+  transform: rotate(-45deg);
 }
 
 .meste-mobile-nav {

@@ -14,7 +14,8 @@ type SiteHeaderProps = {
   alternateHref: string
   chrome: SiteChrome
   locale: Locale
-  menuLabel: string
+  menuCloseLabel: string
+  menuOpenLabel: string
   navLabel: string
 }
 
@@ -22,7 +23,8 @@ export function SiteHeader({
   alternateHref,
   chrome,
   locale,
-  menuLabel,
+  menuCloseLabel,
+  menuOpenLabel,
   navLabel,
 }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -81,14 +83,17 @@ export function SiteHeader({
             variant="compact"
           />
 
+          {/* Icon-only, so the accessible name comes from aria-label and
+              changes with the state. The bars themselves are decorative. */}
           <button
             aria-controls={panelId}
             aria-expanded={isOpen}
+            aria-label={isOpen ? menuCloseLabel : menuOpenLabel}
             className="meste-header__toggle"
             onClick={() => setIsOpen((open) => !open)}
             type="button"
           >
-            {menuLabel}
+            <span aria-hidden="true" className="meste-burger" />
           </button>
         </div>
       </Container>
