@@ -41,6 +41,32 @@ export const ContactSettings: GlobalConfig = createEditorialGlobal({
       maxRows: 7,
     },
     {
+      name: 'quoteConsent',
+      type: 'group',
+      admin: {
+        description:
+          'Legal wording shown beside the quote form consent checkbox, and the version recorded with every submission. The quote page is not published until both are filled.',
+      },
+      fields: [
+        {
+          name: 'statement',
+          type: 'textarea',
+          admin: {
+            description: 'Shown next to the checkbox. Supplied by MESTE, never drafted here.',
+          },
+          localized: true,
+        },
+        {
+          name: 'version',
+          type: 'text',
+          admin: {
+            description:
+              'Stored with each lead so a change of wording stays auditable, e.g. 2026-08-v1.',
+          },
+        },
+      ],
+    },
+    {
       name: 'socialLinks',
       type: 'array',
       fields: [

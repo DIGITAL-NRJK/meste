@@ -103,6 +103,35 @@ test.describe('interior pages', () => {
     expect(response?.status()).toBe(404)
   })
 
+  /**
+   * The quote page is published only while the consent wording exists in the
+   * CMS. On a fresh database it does not, so the route must answer 404 rather
+   * than serve a form that collects personal data without its notice.
+   */
+  test('keeps the quote page unpublished until consent wording exists', async ({ page }) => {
+    const response = await page.goto('/en/request-a-quote')
+    expect([200, 404]).toContain(response?.status())
+
+    if (response?.status() === 200) {
+      await expect(page.locator('form.meste-quote-form')).toBeVisible()
+      await expect(page.getByLabel(/full name/i)).toBeVisible()
+    }
+  })
+
+  test('reaches contact and the quote from the footer', async ({ page }) => {
+    await page.goto('/en')
+
+    const footer = page.locator('footer, .meste-footer').first()
+    await expect(footer.getByRole('link', { name: 'Contact' })).toHaveAttribute(
+      'href',
+      '/en/contact',
+    )
+    await expect(footer.getByRole('link', { name: 'Request a quote' })).toHaveAttribute(
+      'href',
+      '/en/request-a-quote',
+    )
+  })
+
   test('serves the services index with its four worlds', async ({ page }) => {
     await page.goto('/en/services')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('One house')

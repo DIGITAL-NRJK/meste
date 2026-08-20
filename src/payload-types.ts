@@ -3110,6 +3110,19 @@ export interface ContactSetting {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Legal wording shown beside the quote form consent checkbox, and the version recorded with every submission. The quote page is not published until both are filled.
+   */
+  quoteConsent?: {
+    /**
+     * Shown next to the checkbox. Supplied by MESTE, never drafted here.
+     */
+    statement?: string | null;
+    /**
+     * Stored with each lead so a change of wording stays auditable, e.g. 2026-08-v1.
+     */
+    version?: string | null;
+  };
   socialLinks?:
     | {
         platform: 'facebook' | 'instagram' | 'linkedin' | 'tiktok' | 'youtube';
@@ -3564,6 +3577,12 @@ export interface ContactSettingsSelect<T extends boolean = true> {
         label?: T;
         value?: T;
         id?: T;
+      };
+  quoteConsent?:
+    | T
+    | {
+        statement?: T;
+        version?: T;
       };
   socialLinks?:
     | T

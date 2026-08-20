@@ -7,6 +7,7 @@ import { ExperienceComposition } from '@/components/experience/ExperienceComposi
 import { GalleryComposition } from '@/components/gallery/GalleryComposition'
 import { FreshComposition } from '@/components/fresh/FreshComposition'
 import { MenusComposition } from '@/components/menus/MenusComposition'
+import { QuoteComposition } from '@/components/quote/QuoteComposition'
 import { ServicesComposition } from '@/components/services/ServicesComposition'
 import { isLocale, locales, type Locale } from '@/lib/i18n/config'
 import { formatPageTitle } from '@/lib/i18n/site'
@@ -18,6 +19,7 @@ import { getExperienceContent } from '@/lib/payload/queries/experiencePage'
 import { getFreshContent } from '@/lib/payload/queries/freshPage'
 import { getGalleryContent } from '@/lib/payload/queries/galleryPage'
 import { getMenusContent } from '@/lib/payload/queries/menusPage'
+import { getQuotePage } from '@/lib/payload/queries/quotePage'
 import { getServicesContent } from '@/lib/payload/queries/servicesPage'
 import { resolveRouteFromSegments, routePath, type RouteKey } from '@/lib/routes'
 
@@ -38,6 +40,7 @@ const buildableRoutes = [
   'gallery',
   'experience',
   'contact',
+  'quote',
 ] as const
 
 type BuildableRoute = (typeof buildableRoutes)[number]
@@ -55,7 +58,17 @@ function resolve(locale: string, segments: string[]): BuildableRoute | null {
   return route && isBuildable(route) ? route : null
 }
 
-const loaders: Record<BuildableRoute, (locale: Locale) => Promise<{ meta: PageMeta }>> = {
+/**
+ * The quote route is never prerendered: it is published only while the consent
+ * wording exists in the CMS, and a build-time snapshot of that decision would
+ * outlive the decision itself.
+ */
+const dynamicRoutes: BuildableRoute[] = ['quote']
+
+const loaders: Record<
+  Exclude<BuildableRoute, 'quote'>,
+  (locale: Locale) => Promise<{ meta: PageMeta }>
+> = {
   about: getAboutContent,
   contact: getContactContent,
   experience: getExperienceContent,
@@ -67,11 +80,13 @@ const loaders: Record<BuildableRoute, (locale: Locale) => Promise<{ meta: PageMe
 
 export function generateStaticParams() {
   return locales.flatMap((locale) =>
-    buildableRoutes.map((route) => ({
-      locale,
-      // routePath returns `/{locale}/{segment}`; the route only needs the tail.
-      segments: [routePath(route, locale).split('/').slice(2).join('/')],
-    })),
+    buildableRoutes
+      .filter((route) => !dynamicRoutes.includes(route))
+      .map((route) => ({
+        locale,
+        // routePath returns `/{locale}/{segment}`; the route needs the tail.
+        segments: [routePath(route, locale).split('/').slice(2).join('/')],
+      })),
   )
 }
 
@@ -83,7 +98,13 @@ export async function generateMetadata({ params }: InteriorPageProps): Promise<M
     return {}
   }
 
-  const content = await loaders[route](locale)
+  const page = route === 'quote' ? await getQuotePage(locale) : await loaders[route](locale)
+
+  if (!page) {
+    return {}
+  }
+
+  const meta = 'content' in page ? page.content.meta : page.meta
 
   return {
     alternates: {
@@ -94,8 +115,8 @@ export async function generateMetadata({ params }: InteriorPageProps): Promise<M
         'x-default': routePath(route, 'en'),
       },
     },
-    description: content.meta.description,
-    title: { absolute: formatPageTitle(locale, content.meta.title) },
+    description: meta.description,
+    title: { absolute: formatPageTitle(locale, meta.title) },
   }
 }
 
@@ -146,6 +167,17 @@ export default async function InteriorPage({ params }: InteriorPageProps) {
           locale={locale}
         />
       )
+    case 'quote': {
+      const data = await getQuotePage(locale)
+
+      // No consent wording, no form: the branded 404 rather than a page that
+      // collects personal data without telling the visitor what happens to it.
+      if (!data) {
+        notFound()
+      }
+
+      return <QuoteComposition chrome={chrome} data={data} locale={locale} />
+    }
     case 'contact':
       return (
         <ContactComposition

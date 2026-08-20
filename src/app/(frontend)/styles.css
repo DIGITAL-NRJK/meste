@@ -2553,6 +2553,262 @@ html[data-entered='true'] .meste-entry {
   padding-left: 1rem;
 }
 
+/* ==========================================================================
+   Quote request
+   ========================================================================== */
+
+.meste-quote-form {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.75rem);
+  max-width: 46rem;
+}
+
+.meste-fieldset {
+  border: 0;
+  display: grid;
+  gap: 1.35rem;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-fieldset__legend {
+  color: var(--meste-gold-ink);
+  font-size: var(--meste-step-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  margin-bottom: 0.5rem;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.meste-fieldset--inline {
+  gap: 0.6rem;
+}
+
+.meste-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.meste-field label {
+  font-size: var(--meste-step-body);
+  font-weight: 600;
+}
+
+/* Says the word rather than relying on an asterisk or on colour alone. */
+.meste-field__flag {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.meste-field__hint {
+  color: var(--meste-muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.meste-field__error {
+  color: var(--meste-burgundy);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin: 0.15rem 0 0;
+}
+
+.meste-field input,
+.meste-field select,
+.meste-field textarea {
+  background: var(--meste-surface);
+  border: 1px solid var(--meste-rule-strong);
+  color: var(--meste-text);
+  font-family: inherit;
+  font-size: var(--meste-step-body);
+  /* Comfortably past the 24px minimum target used across the site. */
+  min-height: 2.75rem;
+  padding: 0.6rem 0.8rem;
+  width: 100%;
+}
+
+.meste-field textarea {
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.meste-field [aria-invalid='true'] {
+  border-color: var(--meste-burgundy);
+  border-width: 2px;
+}
+
+.meste-choice {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.meste-choice input {
+  block-size: 1.15rem;
+  flex: none;
+  inline-size: 1.15rem;
+  margin-top: 0.25rem;
+}
+
+.meste-choice label {
+  font-size: var(--meste-step-body);
+  line-height: 1.55;
+}
+
+.meste-choice--consent {
+  border-top: 1px solid var(--meste-rule);
+  padding-top: 1.5rem;
+}
+
+/* Optional detail, folded away rather than removed --------------------- */
+
+.meste-details {
+  border-block: 1px solid var(--meste-rule);
+  padding-block: 1.1rem;
+}
+
+.meste-details summary {
+  align-items: baseline;
+  cursor: pointer;
+  display: grid;
+  gap: 0.3rem 1rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  list-style: none;
+}
+
+.meste-details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* `display: grid` removes the disclosure triangle, so the state is drawn back
+   in — and it is a shape, not a colour, so it survives without colour vision. */
+.meste-details summary::after {
+  content: '+';
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  line-height: 1;
+}
+
+.meste-details[open] summary::after {
+  content: '–';
+}
+
+.meste-details__title {
+  font-size: var(--meste-step-lede);
+  grid-column: 1;
+}
+
+.meste-details__hint {
+  grid-column: 1;
+}
+
+.meste-details__hint {
+  color: var(--meste-muted);
+  font-size: 0.85rem;
+}
+
+/* Form and aside ------------------------------------------------------- */
+
+.meste-quote__split {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.meste-quote__aside {
+  border-top: 2px solid var(--meste-gold);
+  padding-top: 1.5rem;
+}
+
+.meste-quote__aside-title {
+  color: var(--meste-burgundy);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--meste-step-h3);
+  font-weight: 600;
+  margin: 0;
+}
+
+.meste-quote__aside-body {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  line-height: 1.6;
+  margin: 0.85rem 0 1.5rem;
+}
+
+@media (min-width: 62rem) {
+  .meste-quote__split {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+
+  .meste-quote__aside {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+.meste-details__body {
+  display: grid;
+  gap: 1.35rem;
+  padding-top: 1.5rem;
+}
+
+/* Error summary and confirmation --------------------------------------- */
+
+.meste-form-summary {
+  border-left: 3px solid var(--meste-burgundy);
+  padding: 0.25rem 0 0.25rem 1rem;
+}
+
+.meste-form-summary__title {
+  color: var(--meste-burgundy);
+  font-size: var(--meste-step-lede);
+  font-weight: 600;
+  margin: 0;
+}
+
+.meste-form-summary__body,
+.meste-form-summary ul {
+  color: var(--meste-text);
+  font-size: var(--meste-step-body);
+  margin: 0.6rem 0 0;
+}
+
+.meste-form-summary ul {
+  display: grid;
+  gap: 0.35rem;
+  padding-left: 1.1rem;
+}
+
+.meste-quote-success {
+  border-left: 3px solid var(--meste-gold);
+  max-width: 46rem;
+  padding-left: clamp(1rem, 3vw, 1.75rem);
+}
+
+.meste-quote-success__title {
+  margin: 0;
+  max-width: 20ch;
+}
+
+.meste-quote-success__body {
+  font-size: var(--meste-step-lede);
+  margin: 1.25rem 0 0;
+}
+
+.meste-quote-success__note {
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  margin: 1rem 0 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
