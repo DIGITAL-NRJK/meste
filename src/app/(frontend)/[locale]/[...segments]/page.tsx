@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 
 import { AboutComposition } from '@/components/about/AboutComposition'
 import { ContactComposition } from '@/components/contact/ContactComposition'
+import { ExperienceComposition } from '@/components/experience/ExperienceComposition'
+import { GalleryComposition } from '@/components/gallery/GalleryComposition'
 import { FreshComposition } from '@/components/fresh/FreshComposition'
 import { MenusComposition } from '@/components/menus/MenusComposition'
 import { ServicesComposition } from '@/components/services/ServicesComposition'
@@ -12,7 +14,9 @@ import type { PageMeta } from '@/lib/pages/types'
 import { getAboutContent } from '@/lib/payload/queries/about'
 import { getSiteChrome } from '@/lib/payload/queries/chrome'
 import { getContactContent } from '@/lib/payload/queries/contact'
+import { getExperienceContent } from '@/lib/payload/queries/experiencePage'
 import { getFreshContent } from '@/lib/payload/queries/freshPage'
+import { getGalleryContent } from '@/lib/payload/queries/galleryPage'
 import { getMenusContent } from '@/lib/payload/queries/menusPage'
 import { getServicesContent } from '@/lib/payload/queries/servicesPage'
 import { resolveRouteFromSegments, routePath, type RouteKey } from '@/lib/routes'
@@ -26,7 +30,15 @@ type InteriorPageProps = {
  * manifest but is not listed here returns the branded 404 rather than an empty
  * shell — an unfinished page is never published as if it were finished.
  */
-const buildableRoutes = ['about', 'services', 'menus', 'fresh', 'contact'] as const
+const buildableRoutes = [
+  'about',
+  'services',
+  'menus',
+  'fresh',
+  'gallery',
+  'experience',
+  'contact',
+] as const
 
 type BuildableRoute = (typeof buildableRoutes)[number]
 
@@ -46,7 +58,9 @@ function resolve(locale: string, segments: string[]): BuildableRoute | null {
 const loaders: Record<BuildableRoute, (locale: Locale) => Promise<{ meta: PageMeta }>> = {
   about: getAboutContent,
   contact: getContactContent,
+  experience: getExperienceContent,
   fresh: getFreshContent,
+  gallery: getGalleryContent,
   menus: getMenusContent,
   services: getServicesContent,
 }
@@ -115,6 +129,22 @@ export default async function InteriorPage({ params }: InteriorPageProps) {
     case 'fresh':
       return (
         <FreshComposition chrome={chrome} content={await getFreshContent(locale)} locale={locale} />
+      )
+    case 'gallery':
+      return (
+        <GalleryComposition
+          chrome={chrome}
+          content={await getGalleryContent(locale)}
+          locale={locale}
+        />
+      )
+    case 'experience':
+      return (
+        <ExperienceComposition
+          chrome={chrome}
+          content={await getExperienceContent(locale)}
+          locale={locale}
+        />
       )
     case 'contact':
       return (
