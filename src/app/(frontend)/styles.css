@@ -2260,6 +2260,251 @@ html[data-entered='true'] .meste-entry {
   max-width: 52ch;
 }
 
+/* ==========================================================================
+   Gallery and The Mama Emma Experience
+   ========================================================================== */
+
+.meste-visually-hidden {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* Empty state — the gallery's launch state ------------------------------- */
+
+.meste-gallery-empty {
+  border-left: 2px solid var(--meste-gold);
+  margin-inline: auto;
+  max-width: 46rem;
+  padding-left: clamp(1.25rem, 3vw, 2rem);
+}
+
+.meste-gallery-empty__title {
+  margin: 0;
+  max-width: 18ch;
+}
+
+.meste-gallery-empty__body {
+  color: var(--meste-muted);
+  margin: 1.25rem 0 0;
+}
+
+/* Filters ----------------------------------------------------------------- */
+
+.meste-gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.meste-gallery-filter {
+  background: transparent;
+  border: 1px solid var(--meste-rule);
+  color: var(--meste-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--meste-step-eyebrow);
+  letter-spacing: 0.16em;
+  /* 24px minimum interactive target, as on the rest of the site. */
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+}
+
+.meste-gallery-filter[aria-pressed='true'] {
+  background: var(--meste-burgundy);
+  border-color: var(--meste-burgundy);
+  color: var(--meste-ivory);
+}
+
+/* Grid -------------------------------------------------------------------- */
+
+.meste-gallery-grid {
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.meste-gallery-tile {
+  background: var(--meste-surface-alt);
+  border: 0;
+  cursor: pointer;
+  display: block;
+  padding: 0;
+  width: 100%;
+}
+
+.meste-gallery-tile__image {
+  aspect-ratio: 4 / 3;
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Lightbox ---------------------------------------------------------------- */
+
+/* Native dialog: the browser supplies the top layer, the inert background and
+   the focus containment. Only the appearance is ours. */
+.meste-lightbox {
+  background: var(--meste-burgundy-deep);
+  border: 0;
+  color: var(--meste-ivory);
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+.meste-lightbox::backdrop {
+  background: rgb(26 5 8 / 92%);
+}
+
+.meste-lightbox[open] {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+.meste-lightbox__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.meste-lightbox__button {
+  background: transparent;
+  border: 1px solid var(--meste-gold-light);
+  color: var(--meste-ivory);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--meste-step-eyebrow);
+  letter-spacing: 0.16em;
+  min-height: 2.5rem;
+  padding: 0.5rem 1.1rem;
+  text-transform: uppercase;
+}
+
+.meste-lightbox__button[disabled] {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.meste-lightbox__figure {
+  margin: 0;
+  max-height: 75vh;
+  text-align: center;
+}
+
+.meste-lightbox__figure img {
+  height: auto;
+  max-height: 65vh;
+  max-width: 100%;
+  object-fit: contain;
+  width: auto;
+}
+
+.meste-lightbox__figure figcaption {
+  color: var(--meste-ivory);
+  font-size: var(--meste-step-body);
+  margin-top: 1rem;
+}
+
+/* The Experience ---------------------------------------------------------- */
+
+.meste-experience-band__title {
+  color: var(--meste-gold-light);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.6rem, 1rem + 2.4vw, 2.8rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.meste-experience-pillars {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+
+.meste-experience-pillars > li {
+  border-top: 1px solid var(--meste-rule-strong);
+  padding-top: 1.25rem;
+}
+
+.meste-experience-pillar__title {
+  color: var(--meste-ivory);
+  margin: 0 0 0.7rem;
+}
+
+.meste-experience-pillar__detail {
+  color: var(--meste-ivory);
+  font-size: var(--meste-step-body);
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.86;
+}
+
+.meste-universe-intro {
+  color: var(--meste-muted);
+  margin: 1.75rem 0 0;
+  max-width: 52ch;
+}
+
+.meste-universe {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+  max-width: 46rem;
+  padding: 0;
+}
+
+.meste-universe li {
+  align-items: baseline;
+  border-top: 1px solid var(--meste-rule);
+  display: flex;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.2rem, 1rem + 0.9vw, 1.7rem);
+  gap: 1.25rem;
+  padding-block: 0.9rem;
+}
+
+.meste-universe li > span[aria-hidden] {
+  color: var(--meste-gold-ink);
+  font-size: var(--meste-step-eyebrow);
+  letter-spacing: 0.2em;
+  width: 2rem;
+}
+
+.meste-disclaimer {
+  border-left: 2px solid var(--meste-gold);
+  color: var(--meste-muted);
+  font-size: var(--meste-step-body);
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  max-width: 46ch;
+  padding-left: 1rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

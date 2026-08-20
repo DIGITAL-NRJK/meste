@@ -99,7 +99,7 @@ test.describe('interior pages', () => {
   })
 
   test('returns the branded not-found state for a page that is not built yet', async ({ page }) => {
-    const response = await page.goto('/en/gallery')
+    const response = await page.goto('/en/journal')
     expect(response?.status()).toBe(404)
   })
 
@@ -116,6 +116,24 @@ test.describe('interior pages', () => {
 
     const body = (await page.locator('body').innerText()).toLowerCase()
     expect(body).not.toMatch(/gh[₵s]|\busd\b|€|\$\d/)
+  })
+
+  test('serves the gallery in its branded empty state', async ({ page }) => {
+    await page.goto('/en/gallery')
+    await expect(page.getByRole('heading', { name: /photography is being shot/i })).toBeVisible()
+    await expect(page.locator('.meste-gallery-grid')).toHaveCount(0)
+    await expect(page.locator('dialog')).toHaveCount(0)
+  })
+
+  test('serves the Experience as a concept, never as a scheduled event', async ({ page }) => {
+    await page.goto('/en/the-mama-emma-experience')
+    await expect(page.getByText('Dine · Discover · Connect')).toBeVisible()
+    await expect(
+      page.getByText('A signature Mama Emma concept currently in development.'),
+    ).toBeVisible()
+
+    const body = await page.locator('body').innerText()
+    expect(body).not.toMatch(/\b20\d{2}\b/)
   })
 
   test('serves Mama Emma Fresh with no unverified claim', async ({ page }) => {

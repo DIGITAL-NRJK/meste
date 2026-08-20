@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { locales } from '@/lib/i18n/config'
 import { getAboutBaseline } from '@/lib/pages/about/content'
 import { getContactBaseline } from '@/lib/pages/contact/content'
+import { mediaCategories } from '@/collections/Media'
+import { getExperienceBaseline } from '@/lib/pages/experience/content'
 import { getFreshBaseline } from '@/lib/pages/fresh/content'
+import { getGalleryBaseline } from '@/lib/pages/gallery/content'
 import { getMenusBaseline } from '@/lib/pages/menus/content'
 import { getServicesBaseline } from '@/lib/pages/services/content'
 import { resolveRouteFromSegments, routePath } from '@/lib/routes'
@@ -13,7 +16,15 @@ const priceShapes = [/GH[₵S]|\bUSD\b|€|\$\d/, /\bà partir de \d|\bfrom \d+\
 describe('interior route resolution', () => {
   it('round-trips every localized segment back to its route key', () => {
     for (const locale of locales) {
-      for (const route of ['about', 'services', 'menus', 'fresh', 'contact'] as const) {
+      for (const route of [
+        'about',
+        'services',
+        'menus',
+        'fresh',
+        'gallery',
+        'experience',
+        'contact',
+      ] as const) {
         const segments = routePath(route, locale).split('/').slice(2)
         expect(resolveRouteFromSegments(segments, locale)).toBe(route)
       }
@@ -133,6 +144,8 @@ describe('interior pages publish no price', () => {
         getServicesBaseline(locale),
         getMenusBaseline(locale),
         getFreshBaseline(locale),
+        getGalleryBaseline(locale),
+        getExperienceBaseline(locale),
         getContactBaseline(locale),
       ])
 
@@ -151,6 +164,8 @@ describe('bilingual completeness', () => {
         getServicesBaseline(locale),
         getMenusBaseline(locale),
         getFreshBaseline(locale),
+        getGalleryBaseline(locale),
+        getExperienceBaseline(locale),
         getContactBaseline(locale),
       ]) {
         const empties: string[] = []
@@ -284,6 +299,96 @@ describe('Mama Emma Fresh baseline', () => {
 
     for (const locale of locales) {
       expect(getFreshBaseline(locale).culinary.caveat.trim().length).toBeGreaterThan(10)
+    }
+  })
+})
+
+describe('gallery baseline', () => {
+  /**
+   * No approved photography exists. Shipping an image here would mean it came
+   * from somewhere it should not have.
+   */
+  it('ships empty, with a branded empty state rather than filler', () => {
+    for (const locale of locales) {
+      const content = getGalleryBaseline(locale)
+
+      expect(content.items).toEqual([])
+      expect(content.empty.heading.trim().length).toBeGreaterThan(5)
+      expect(content.empty.body.trim().length).toBeGreaterThan(40)
+    }
+  })
+
+  /**
+   * The frontend cannot import the Payload collection, so the label map is a
+   * separate list. This binds the two: a category added to the schema without a
+   * label here would otherwise render on the site as a raw slug.
+   */
+  it('labels every category the media taxonomy defines', () => {
+    for (const locale of locales) {
+      const { categoryLabels } = getGalleryBaseline(locale)
+
+      for (const category of mediaCategories) {
+        expect(categoryLabels[category]?.trim().length ?? 0).toBeGreaterThan(1)
+      }
+
+      expect(Object.keys(categoryLabels).sort()).toEqual([...mediaCategories].sort())
+    }
+  })
+
+  it('names the lightbox controls in both locales', () => {
+    for (const locale of locales) {
+      const { lightbox } = getGalleryBaseline(locale)
+
+      for (const label of Object.values(lightbox)) {
+        expect(label.trim().length).toBeGreaterThan(2)
+      }
+    }
+  })
+})
+
+describe('Experience concept baseline', () => {
+  it('carries the approved triptych and the development disclaimer', () => {
+    for (const locale of locales) {
+      const content = getExperienceBaseline(locale)
+
+      expect(content.pillars.items.map((pillar) => pillar.title)).toEqual([
+        'Dine',
+        'Discover',
+        'Connect',
+      ])
+      expect(content.pillars.heading).toBe('Dine · Discover · Connect')
+      expect(content.disclaimer.toLowerCase()).toContain(
+        locale === 'fr' ? 'développement' : 'development',
+      )
+      expect(content.universe.items).toHaveLength(5)
+    }
+  })
+
+  /**
+   * `This event concept is NOT officially launched.` The brief forbids
+   * inventing dates, frequency, prices, capacity or venues — so none of them
+   * may appear, in any shape.
+   */
+  it('announces no date, frequency, capacity or venue', () => {
+    for (const locale of locales) {
+      const serialized = JSON.stringify(getExperienceBaseline(locale))
+
+      expect(serialized).not.toMatch(/\b20\d{2}\b/)
+      expect(serialized).not.toMatch(
+        /monthly|quarterly|every month|chaque mois|mensuel|trimestriel/i,
+      )
+      expect(serialized).not.toMatch(/\d+\s*(seats|places|guests|convives)/i)
+      expect(serialized).not.toMatch(/january|février|venue at|à l.adresse/i)
+    }
+  })
+
+  /**
+   * The interest-list pipeline is Phase 6. Until it exists, the page must not
+   * offer a form or imply one is available.
+   */
+  it('offers a channel that exists today rather than a form that does not', () => {
+    for (const locale of locales) {
+      expect(getExperienceBaseline(locale).closing.action.route).toBe('contact')
     }
   })
 })
