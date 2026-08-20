@@ -22,6 +22,7 @@ const chrome: Record<Locale, SiteChrome> = {
       { label: 'Mama Emma Fresh', route: 'fresh' },
       { label: 'Gallery', route: 'gallery' },
       { label: 'The Experience', route: 'experience' },
+      { label: 'Contact', route: 'contact' },
     ],
     primaryAction: { label: 'Plan your event', route: 'quote' },
     footer: {
@@ -41,6 +42,7 @@ const chrome: Record<Locale, SiteChrome> = {
           items: [
             { label: 'Services', route: 'services' },
             { label: 'Menu collection', route: 'menus' },
+            { label: 'Contact', route: 'contact' },
           ],
         },
       ],
@@ -72,6 +74,7 @@ const chrome: Record<Locale, SiteChrome> = {
       { label: 'Mama Emma Fresh', route: 'fresh' },
       { label: 'Galerie', route: 'gallery' },
       { label: 'The Experience', route: 'experience' },
+      { label: 'Contact', route: 'contact' },
     ],
     primaryAction: { label: 'Demander un devis', route: 'quote' },
     footer: {
@@ -91,6 +94,7 @@ const chrome: Record<Locale, SiteChrome> = {
           items: [
             { label: 'Prestations', route: 'services' },
             { label: 'Collection de menus', route: 'menus' },
+            { label: 'Contact', route: 'contact' },
           ],
         },
       ],

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { getAlternateLocale, type Locale } from '@/lib/i18n/config'
+import { getSiteDictionary } from '@/lib/i18n/site'
 import { routePath, type RouteKey } from '@/lib/routes'
 import type { SiteChrome } from '@/lib/site/types'
 
@@ -35,6 +36,7 @@ export function PageShell({
   trailing,
 }: PageShellProps) {
   const alternateLocale = getAlternateLocale(locale)
+  const dictionary = getSiteDictionary(locale)
 
   return (
     <>
@@ -49,8 +51,9 @@ export function PageShell({
           alternateHref={routePath(route, alternateLocale)}
           chrome={chrome}
           locale={locale}
-          menuLabel="Menu"
-          navLabel={locale === 'fr' ? 'Navigation principale' : 'Primary navigation'}
+          menuCloseLabel={dictionary.menuCloseLabel}
+          menuOpenLabel={dictionary.menuOpenLabel}
+          navLabel={dictionary.navLabel}
         />
 
         <main id="main" tabIndex={-1}>

@@ -4,6 +4,10 @@ type SiteDictionary = {
   alternateLanguageLabel: string
   defaultDescription: string
   defaultTitle: string
+  /** Accessible name of the mobile toggle. The button itself shows an icon. */
+  menuCloseLabel: string
+  menuOpenLabel: string
+  navLabel: string
   titleTemplate: string
 }
 
@@ -13,12 +17,18 @@ const dictionaries: Record<Locale, SiteDictionary> = {
     defaultDescription:
       'Premium African catering and hospitality in Accra. Taste · Elegance · Hospitality.',
     defaultTitle: 'MESTE — Mama Emma Service Traiteur d’Excellence',
+    menuCloseLabel: 'Close menu',
+    menuOpenLabel: 'Open menu',
+    navLabel: 'Primary navigation',
     titleTemplate: '%s — MESTE',
   },
   fr: {
     alternateLanguageLabel: 'Read in English',
     defaultDescription: 'Service traiteur d’excellence à Accra. Taste · Elegance · Hospitality.',
     defaultTitle: 'MESTE — Mama Emma Service Traiteur d’Excellence',
+    menuCloseLabel: 'Fermer le menu',
+    menuOpenLabel: 'Ouvrir le menu',
+    navLabel: 'Navigation principale',
     titleTemplate: '%s — MESTE',
   },
 }
