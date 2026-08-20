@@ -42,6 +42,7 @@ const chrome: Record<Locale, SiteChrome> = {
           items: [
             { label: 'Services', route: 'services' },
             { label: 'Menu collection', route: 'menus' },
+            { label: 'Request a quote', route: 'quote' },
             { label: 'Contact', route: 'contact' },
           ],
         },
@@ -94,6 +95,7 @@ const chrome: Record<Locale, SiteChrome> = {
           items: [
             { label: 'Prestations', route: 'services' },
             { label: 'Collection de menus', route: 'menus' },
+            { label: 'Demander un devis', route: 'quote' },
             { label: 'Contact', route: 'contact' },
           ],
         },

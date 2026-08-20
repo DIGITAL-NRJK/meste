@@ -86,14 +86,11 @@ describe('site navigation', () => {
   })
 
   /**
-   * Asking for a proposal and asking a question are different intentions. The
-   * quote stays the promoted call to action; contact is the quieter path, and
-   * the footer carries it.
-   *
-   * The footer deliberately does not link to the quote route yet: that page
-   * does not exist, and a navigation link to a 404 is worse than no link.
+   * Asking for a proposal and asking a question are different intentions. Both
+   * are reachable from the footer now that the quote page exists; only the
+   * quote is promoted as the header call to action.
    */
-  it('carries contact in the footer, and no link to an unbuilt page', () => {
+  it('offers both conversion paths in the footer', () => {
     for (const locale of locales) {
       const chrome = getChromeBaseline(locale)
       const footerRoutes = chrome.footer.columns.flatMap((column) =>
@@ -101,7 +98,7 @@ describe('site navigation', () => {
       )
 
       expect(footerRoutes).toContain('contact')
-      expect(footerRoutes).not.toContain('quote')
+      expect(footerRoutes).toContain('quote')
       expect(chrome.primaryAction.route).toBe('quote')
     }
   })
