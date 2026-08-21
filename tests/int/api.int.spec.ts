@@ -23,7 +23,6 @@ describe('Payload publication and privacy boundaries', () => {
     if (!payload) {
       return
     }
-    
     if (pageID) {
       await payload.delete({
         id: pageID,
