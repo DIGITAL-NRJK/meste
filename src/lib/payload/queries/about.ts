@@ -4,16 +4,24 @@ import type { Locale } from '@/lib/i18n/config'
 import { getAboutBaseline } from '@/lib/pages/about/content'
 import type { AboutContent } from '@/lib/pages/about/types'
 import { getPayloadClient } from '@/lib/payload/client'
-import { readPath, readString } from '@/lib/payload/records'
+import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
+import {
+  mergeChapters,
+  mergeClosing,
+  mergeIntro,
+  mergePullQuote,
+} from '@/lib/payload/queries/pageContent'
+import { readPath, readString, withImage } from '@/lib/payload/records'
 
 /**
- * The story page merges the published `pages` entry over its approved baseline.
+ * The story page merges the published `pages` entry over its approved baseline,
+ * field by field.
  *
- * Only the metadata is merged today: the narrative itself lives in `layout`
- * blocks, which need the controlled block renderer to become presentation. The
- * baseline therefore stays authoritative for the body copy, exactly as it does
- * on the homepage, and an unreachable database degrades to it rather than
- * failing the page.
+ * Nothing here is required. An editor who fills in only the lede changes only
+ * the lede; the six chapters, the held statement and the closing keep the
+ * approved wording. An unreachable database keeps all of it. That is the whole
+ * contract: Payload drives the page, and the code is what the page falls back
+ * to rather than what it competes with.
  *
  * The read passes `overrideAccess: false`, so collection access control adds
  * the published and locale-readiness constraints on its own. Restating them in
@@ -42,15 +50,23 @@ async function queryAboutContent(locale: Locale): Promise<AboutContent> {
       return baseline
     }
 
-    const title = readString(readPath(doc, 'seo', 'title')) ?? readString(doc.title)
-    const description = readString(readPath(doc, 'seo', 'description'))
+    const editorial = readPath(doc, 'editorial')
+    const story = readPath(doc, 'aboutStory')
+    const intro = mergeIntro(baseline.intro, readPath(editorial, 'intro'))
 
     return {
-      ...baseline,
-      meta: {
-        description: description ?? baseline.meta.description,
-        title: title ?? baseline.meta.title,
+      chapters: {
+        eyebrow: readString(readPath(story, 'eyebrow')) ?? baseline.chapters.eyebrow,
+        heading: readString(readPath(story, 'heading')) ?? baseline.chapters.heading,
+        headingAccent:
+          readString(readPath(story, 'headingAccent')) ?? baseline.chapters.headingAccent,
+        items: mergeChapters(baseline.chapters.items, readPath(story, 'chapters')),
       },
+      closing: mergeClosing(baseline.closing, readPath(editorial, 'closing')),
+      intro: { ...intro, media: withImage(baseline.intro.media, readPath(story, 'introImage')) },
+      meta: mergePageMeta(baseline.meta, doc),
+      pullQuote: mergePullQuote(baseline.pullQuote, readPath(story, 'pullQuote')),
+      skipToContent: baseline.skipToContent,
     }
   } catch (error) {
     console.error('[about] falling back to the editorial baseline', error)
