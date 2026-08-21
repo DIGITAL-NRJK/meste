@@ -8,6 +8,13 @@ type SiteDictionary = {
   menuCloseLabel: string
   menuOpenLabel: string
   navLabel: string
+  /** The branded 404. Interface copy, so it stays in code beside the route. */
+  notFound: {
+    action: string
+    body: string
+    code: string
+    title: string
+  }
   titleTemplate: string
 }
 
@@ -20,6 +27,12 @@ const dictionaries: Record<Locale, SiteDictionary> = {
     menuCloseLabel: 'Close menu',
     menuOpenLabel: 'Open menu',
     navLabel: 'Primary navigation',
+    notFound: {
+      action: 'Return to MESTE',
+      body: 'The page may have moved, or may not be ready yet.',
+      code: '404 · No such table',
+      title: 'This place is not set at our table.',
+    },
     titleTemplate: '%s — MESTE',
   },
   fr: {
@@ -29,6 +42,12 @@ const dictionaries: Record<Locale, SiteDictionary> = {
     menuCloseLabel: 'Fermer le menu',
     menuOpenLabel: 'Ouvrir le menu',
     navLabel: 'Navigation principale',
+    notFound: {
+      action: 'Retour à MESTE',
+      body: 'La page a peut-être changé d’adresse, ou n’est pas encore prête.',
+      code: '404 · Table introuvable',
+      title: 'Cette place n’est pas dressée à notre table.',
+    },
     titleTemplate: '%s — MESTE',
   },
 }
