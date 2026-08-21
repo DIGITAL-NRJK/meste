@@ -97,3 +97,68 @@ describe('where uploads are written', () => {
     expect(dir).not.toBe('media')
   })
 })
+
+describe('the canonical site origin', () => {
+  const original = { ...process.env }
+
+  afterEach(() => {
+    process.env = { ...original }
+    vi.resetModules()
+  })
+
+  const read = async () => {
+    vi.resetModules()
+    const { getServerEnvironment } = await import('@/lib/env/server')
+    return getServerEnvironment().NEXT_PUBLIC_SERVER_URL
+  }
+
+  const base = {
+    DATABASE_URL: 'postgres://localhost/meste',
+    PAYLOAD_SECRET: 'x'.repeat(32),
+  }
+
+  it('keeps a configured origin', async () => {
+    process.env = { ...original, ...base, NEXT_PUBLIC_SERVER_URL: 'https://meste.example' }
+    expect(await read()).toBe('https://meste.example')
+  })
+
+  /**
+   * The defect that took every dynamic route down on deploy previews. Netlify
+   * injects a variable with no value for the current context as an empty
+   * string rather than omitting it, so `z.url()` rejected it before any default
+   * could apply, and the whole config threw while loading.
+   */
+  it('survives the empty string Netlify injects', async () => {
+    process.env = {
+      ...original,
+      ...base,
+      DEPLOY_PRIME_URL: 'https://deploy-preview-15--meste.netlify.app',
+      NEXT_PUBLIC_SERVER_URL: '',
+    }
+
+    expect(await read()).toBe('https://deploy-preview-15--meste.netlify.app')
+  })
+
+  it('prefers this deploy over the site origin', async () => {
+    process.env = {
+      ...original,
+      ...base,
+      DEPLOY_PRIME_URL: 'https://deploy-preview-15--meste.netlify.app',
+      NEXT_PUBLIC_SERVER_URL: '   ',
+      URL: 'https://meste.netlify.app',
+    }
+
+    expect(await read()).toBe('https://deploy-preview-15--meste.netlify.app')
+  })
+
+  it('falls back to the site origin, then to localhost', async () => {
+    process.env = { ...original, ...base, NEXT_PUBLIC_SERVER_URL: '', URL: 'https://meste.app' }
+    expect(await read()).toBe('https://meste.app')
+
+    process.env = { ...original, ...base }
+    delete process.env.NEXT_PUBLIC_SERVER_URL
+    delete process.env.DEPLOY_PRIME_URL
+    delete process.env.URL
+    expect(await read()).toBe('http://localhost:3000')
+  })
+})
