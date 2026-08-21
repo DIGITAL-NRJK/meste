@@ -13,6 +13,49 @@ import { isRouteKey } from '@/lib/routes'
  * are the same answer — no — and the baseline stands.
  */
 
+/**
+ * Replaces the named string fields of a baseline object with whatever the CMS
+ * actually says, and nothing else. Only the keys asked for are considered, so a
+ * section keeps every shape the baseline gave it — lists, media, nested
+ * objects — while its wording becomes editable.
+ */
+export function mergeStrings<T extends object>(
+  baseline: T,
+  source: unknown,
+  keys: (keyof T & string)[],
+): T {
+  const merged = { ...baseline } as Record<string, unknown>
+
+  for (const key of keys) {
+    const value = readString(readPath(source, key))
+
+    if (value) {
+      merged[key] = value
+    }
+  }
+
+  return merged as T
+}
+
+/**
+ * Builds a repeated block from CMS rows, and keeps the approved sequence when
+ * nothing usable comes back. `build` returns null for a row that is too
+ * incomplete to publish; if every row is, the baseline stands untouched rather
+ * than the section emptying itself.
+ */
+export function mergeList<T>(
+  baseline: T[],
+  source: unknown,
+  build: (entry: unknown) => T | null,
+): T[] {
+  const items = readArray(source).flatMap((entry) => {
+    const built = build(entry)
+    return built ? [built] : []
+  })
+
+  return items.length > 0 ? items : baseline
+}
+
 /** Unwraps the `[{ text }]` rows Payload uses for a list of plain strings. */
 export function readTextList(value: unknown): string[] {
   return readArray(value).flatMap((entry) => {

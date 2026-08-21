@@ -4,8 +4,9 @@ import type { Locale } from '@/lib/i18n/config'
 import { getGalleryBaseline } from '@/lib/pages/gallery/content'
 import type { GalleryContent, GalleryItem } from '@/lib/pages/gallery/types'
 import { getPayloadClient } from '@/lib/payload/client'
+import { mergeClosing, mergeIntro, mergeStrings } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
-import { readString, resolveImage } from '@/lib/payload/records'
+import { readPath, readString, resolveImage } from '@/lib/payload/records'
 
 const GALLERY_LIMIT = 120
 
@@ -68,10 +69,19 @@ async function queryGalleryContent(locale: Locale): Promise<GalleryContent> {
       ]
     })
 
+    const doc = page.docs[0]
+    const editorial = readPath(doc, 'editorial')
+
     return {
       ...baseline,
+      closing: mergeClosing(baseline.closing, readPath(editorial, 'closing')),
+      empty: mergeStrings(baseline.empty, readPath(doc, 'galleryContent', 'empty'), [
+        'body',
+        'heading',
+      ]),
+      intro: mergeIntro(baseline.intro, readPath(editorial, 'intro')),
       items,
-      meta: mergePageMeta(baseline.meta, page.docs[0]),
+      meta: mergePageMeta(baseline.meta, doc),
     }
   } catch (error) {
     console.error('[gallery] falling back to the editorial baseline', error)

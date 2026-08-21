@@ -9,6 +9,11 @@ import {
   aboutStoryField,
   contactChannelsField,
   pageEditorialField,
+  experienceContentField,
+  freshContentField,
+  galleryContentField,
+  menusContentField,
+  servicesContentField,
 } from '@/collections/fields/pageContent'
 
 const preview = createPreviewURL(({ doc, locale }) => {
@@ -65,6 +70,11 @@ export const Pages: CollectionConfig = createEditorialCollection({
     pageEditorialField,
     aboutStoryField,
     contactChannelsField,
+    servicesContentField,
+    menusContentField,
+    freshContentField,
+    galleryContentField,
+    experienceContentField,
     {
       name: 'layout',
       type: 'blocks',

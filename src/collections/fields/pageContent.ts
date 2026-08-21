@@ -222,3 +222,215 @@ export const contactChannelsField: Field = {
   fields: [localizedText('eyebrow', 'Eyebrow'), localizedText('heading', 'Heading')],
   label: 'Contact — channels section',
 }
+
+/**
+ * The frame every section of the site shares: a small label, then a heading in
+ * two typographic halves. Building it once is what keeps seven pages looking
+ * like one house rather than seven.
+ */
+function sectionFields(extra: Field[] = []): Field[] {
+  return [
+    localizedText('eyebrow', 'Eyebrow'),
+    localizedText('heading', 'Heading — lead', HEADING_SPLIT),
+    localizedText('headingAccent', 'Heading — accent'),
+    ...extra,
+  ]
+}
+
+function section(name: string, label: string, extra: Field[] = [], description?: string): Field {
+  return {
+    name,
+    type: 'group',
+    admin: description ? { description } : undefined,
+    fields: sectionFields(extra),
+    label,
+  }
+}
+
+/**
+ * A repeated block of editorial content. Localized at the array, never at the
+ * leaves, for the reason given above. Taken whole or not at all, like the story
+ * chapters.
+ */
+function blockList(name: string, label: string, description: string, fields: Field[]): Field {
+  return {
+    name,
+    type: 'array',
+    admin: { description },
+    fields,
+    label,
+    localized: true,
+    maxRows: 20,
+  }
+}
+
+/** Says where a list actually lives, so an editor stops looking for it here. */
+const maintainedIn = (where: string) =>
+  `${EMPTY_MEANS_BASELINE} The entries themselves are maintained in ${where}.`
+
+export const servicesContentField: Field = {
+  name: 'servicesContent',
+  type: 'group',
+  admin: {
+    condition: (data) => data?.pageKind === 'services',
+    description: EMPTY_MEANS_BASELINE,
+  },
+  fields: [
+    section('worlds', 'Worlds of service', [
+      blockList('items', 'Worlds', 'One block per world. Replaced as a set.', [
+        localizedText('title', 'Title', undefined, false),
+        stringList('items', 'Lines', 'One row per line.', false),
+      ]),
+    ]),
+    section(
+      'formats',
+      'Reception formats',
+      [localizedProse('note', 'Note')],
+      maintainedIn('Content → Reception formats'),
+    ),
+    {
+      name: 'references',
+      type: 'group',
+      admin: {
+        description:
+          'Shown while no client may be named. A reference appears on the site only once it is published and carries recorded permission to be displayed.',
+      },
+      fields: [
+        localizedText('eyebrow', 'Eyebrow'),
+        localizedText('heading', 'Heading'),
+        localizedProse('body', 'Body'),
+      ],
+      label: 'References note',
+    },
+  ],
+  label: 'Services',
+}
+
+export const menusContentField: Field = {
+  name: 'menusContent',
+  type: 'group',
+  admin: {
+    condition: (data) => data?.pageKind === 'menus',
+    description: EMPTY_MEANS_BASELINE,
+  },
+  fields: [
+    section('levels', 'Culinary levels', [
+      blockList('items', 'Levels', 'One block per level. Replaced as a set.', [
+        localizedText('name', 'Name', undefined, false),
+        localizedProse('body', 'Body', undefined, false),
+        stringList('list', 'Lines', 'Optional. Rendered under the body.', false),
+      ]),
+    ]),
+    section(
+      'families',
+      'Menu families',
+      [],
+      maintainedIn('Content → Menu categories and Menu items'),
+    ),
+    section(
+      'signatureDishes',
+      'Signature dishes',
+      [localizedProse('intro', 'Intro')],
+      maintainedIn('Content → Menu items, by marking a dish as featured'),
+    ),
+    section(
+      'signatureMenus',
+      'Signature menus',
+      [localizedProse('note', 'Note')],
+      maintainedIn('Content → Signature menus'),
+    ),
+  ],
+  label: 'Menus',
+}
+
+export const freshContentField: Field = {
+  name: 'freshContent',
+  type: 'group',
+  admin: {
+    condition: (data) => data?.pageKind === 'fresh',
+    description: EMPTY_MEANS_BASELINE,
+  },
+  fields: [
+    section(
+      'range',
+      'The range',
+      [localizedProse('note', 'Note'), localizedText('signature', 'Signature line')],
+      maintainedIn('Content → Fresh products'),
+    ),
+    section('culinary', 'Culinary uses', [
+      localizedProse('intro', 'Intro'),
+      localizedProse(
+        'caveat',
+        'Caveat',
+        'States that these are possibilities, not recipes in service. Removing it turns a suggestion into a claim about what is actually cooked.',
+      ),
+      blockList('items', 'Flavours', 'One block per flavour. Replaced as a set.', [
+        localizedText('flavour', 'Flavour', undefined, false),
+        stringList('uses', 'Possible uses', 'One row per suggestion.', false),
+      ]),
+    ]),
+  ],
+  label: 'Mama Emma Fresh',
+}
+
+/**
+ * The gallery.
+ *
+ * Only the empty state is editable. Category labels, filter labels and the
+ * lightbox controls are interface, not editorial: each names a behaviour the
+ * code performs, and the category labels are bound to the media taxonomy by a
+ * unit test so a slug can never reach the page unlabelled.
+ */
+export const galleryContentField: Field = {
+  name: 'galleryContent',
+  type: 'group',
+  admin: {
+    condition: (data) => data?.pageKind === 'gallery',
+    description: maintainedIn('Content → Gallery'),
+  },
+  fields: [
+    {
+      name: 'empty',
+      type: 'group',
+      admin: {
+        description: 'Shown while no photograph is published. It is the launch state.',
+      },
+      fields: [localizedText('heading', 'Heading'), localizedProse('body', 'Body')],
+      label: 'Empty state',
+    },
+  ],
+  label: 'Gallery',
+}
+
+export const experienceContentField: Field = {
+  name: 'experienceContent',
+  type: 'group',
+  admin: {
+    condition: (data) => data?.pageKind === 'experience',
+    description: EMPTY_MEANS_BASELINE,
+  },
+  fields: [
+    section('universe', 'The universe', [
+      localizedProse('intro', 'Intro'),
+      stringList('items', 'Lines', 'One row per line.'),
+    ]),
+    {
+      name: 'pillars',
+      type: 'group',
+      fields: [
+        localizedText('heading', 'Heading'),
+        blockList('items', 'Pillars', 'One block per pillar. Replaced as a set.', [
+          localizedText('title', 'Title', undefined, false),
+          localizedProse('detail', 'Detail', undefined, false),
+        ]),
+      ],
+      label: 'Pillars',
+    },
+    localizedProse(
+      'disclaimer',
+      'Disclaimer',
+      'States that the concept is in development. Removing it publishes a concept as though it were already running.',
+    ),
+  ],
+  label: 'The Mama Emma Experience',
+}
