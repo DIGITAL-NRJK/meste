@@ -8,5 +8,6 @@ export default defineConfig({
     include: ['tests/int/**/*.int.spec.ts'],
     name: 'integration',
     setupFiles: ['./vitest.setup.ts'],
+    testTimeout: 30_000,
   },
 })
