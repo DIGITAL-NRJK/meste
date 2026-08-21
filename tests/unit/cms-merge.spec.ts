@@ -1,17 +1,40 @@
+import type { Field } from 'payload'
 import { describe, expect, it } from 'vitest'
+
+import {
+  aboutStoryField,
+  experienceContentField,
+  freshContentField,
+  galleryContentField,
+  menusContentField,
+  pageEditorialField,
+  servicesContentField,
+} from '@/collections/fields/pageContent'
 
 import { getAboutBaseline } from '@/lib/pages/about/content'
 import { getContactBaseline } from '@/lib/pages/contact/content'
+import { getExperienceBaseline } from '@/lib/pages/experience/content'
+import { getFreshBaseline } from '@/lib/pages/fresh/content'
+import { getGalleryBaseline } from '@/lib/pages/gallery/content'
+import { getMenusBaseline } from '@/lib/pages/menus/content'
+import { getServicesBaseline } from '@/lib/pages/services/content'
 import {
   mergeChapters,
   mergeClosing,
   mergeIntro,
+  mergeList,
   mergePullQuote,
+  mergeStrings,
   readTextList,
 } from '@/lib/payload/queries/pageContent'
 
 const about = getAboutBaseline('en')
 const contact = getContactBaseline('en')
+const experience = getExperienceBaseline('en')
+const fresh = getFreshBaseline('en')
+const gallery = getGalleryBaseline('en')
+const menus = getMenusBaseline('en')
+const services = getServicesBaseline('en')
 
 describe('an empty CMS never empties a page', () => {
   /**
@@ -149,5 +172,143 @@ describe('readTextList', () => {
       'b',
     ])
     expect(readTextList(undefined)).toEqual([])
+  })
+})
+
+describe('section framing', () => {
+  const frame = ['eyebrow', 'heading', 'headingAccent'] as const
+
+  /**
+   * Every interior section composes `mergeStrings`. If an absent CMS value can
+   * blank a heading here, it can blank one on all five pages at once.
+   */
+  it('leaves a section untouched when the CMS says nothing', () => {
+    for (const source of [undefined, null, {}, { heading: '   ' }, 'nonsense']) {
+      expect(mergeStrings(menus.levels, source, [...frame])).toEqual(menus.levels)
+      expect(mergeStrings(services.worlds, source, [...frame])).toEqual(services.worlds)
+      expect(mergeStrings(fresh.range, source, [...frame, 'note', 'signature'])).toEqual(
+        fresh.range,
+      )
+      expect(mergeStrings(experience.universe, source, [...frame, 'intro'])).toEqual(
+        experience.universe,
+      )
+      expect(mergeStrings(gallery.empty, source, ['body', 'heading'])).toEqual(gallery.empty)
+    }
+  })
+
+  it('replaces only the keys it was asked for', () => {
+    const merged = mergeStrings(menus.levels, { eyebrow: 'New eyebrow', items: [] }, [...frame])
+
+    expect(merged.eyebrow).toBe('New eyebrow')
+    expect(merged.heading).toBe(menus.levels.heading)
+    // `items` was not among the keys, so the approved levels survive.
+    expect(merged.items).toEqual(menus.levels.items)
+  })
+})
+
+describe('repeated blocks', () => {
+  const build = (entry: unknown) => {
+    const title = readTextList([{ text: (entry as { title?: string })?.title ?? '' }])[0]
+    return title ? { title } : null
+  }
+
+  it('keeps the approved sequence when no row is publishable', () => {
+    const baseline = [{ title: 'Approved' }]
+
+    expect(mergeList(baseline, undefined, build)).toEqual(baseline)
+    expect(mergeList(baseline, [], build)).toEqual(baseline)
+    expect(mergeList(baseline, [{}, { title: '  ' }], build)).toEqual(baseline)
+  })
+
+  it('replaces the sequence as a set, never row by row', () => {
+    const baseline = [{ title: 'First' }, { title: 'Second' }]
+    const merged = mergeList(baseline, [{ title: 'Only one' }], build)
+
+    expect(merged).toEqual([{ title: 'Only one' }])
+  })
+})
+
+/**
+ * Binds the Payload schema to the shapes the site actually renders.
+ *
+ * TypeScript already refuses a key that the baseline does not have, so the
+ * query layer cannot read a field that does not exist. Nothing checks the other
+ * direction: a group whose field is named `headingAccented` would save happily
+ * in the admin and be silently ignored on the page — an editor typing into a
+ * box that does nothing. This test fails the moment the two drift.
+ */
+describe('the admin fields match what the pages render', () => {
+  const groupNames = (field: Field | undefined, ...path: string[]): string[] => {
+    let current = field
+
+    for (const step of path) {
+      const children = current && 'fields' in current ? (current.fields as Field[]) : []
+      current = children.find((child) => 'name' in child && child.name === step)
+    }
+
+    const fields = current && 'fields' in current ? (current.fields as Field[]) : []
+    return fields.flatMap((child) => ('name' in child && child.name ? [child.name] : []))
+  }
+
+  const cases: [string, string[], string[]][] = [
+    ['editorial.intro', groupNames(pageEditorialField, 'intro'), Object.keys(contact.intro)],
+    ['editorial.closing', groupNames(pageEditorialField, 'closing'), Object.keys(contact.closing)],
+    ['about.pullQuote', groupNames(aboutStoryField, 'pullQuote'), Object.keys(about.pullQuote)],
+    ['services.worlds', groupNames(servicesContentField, 'worlds'), Object.keys(services.worlds)],
+    [
+      'services.formats',
+      groupNames(servicesContentField, 'formats'),
+      Object.keys(services.formats),
+    ],
+    [
+      'services.references',
+      groupNames(servicesContentField, 'references'),
+      Object.keys(services.references),
+    ],
+    ['menus.levels', groupNames(menusContentField, 'levels'), Object.keys(menus.levels)],
+    ['menus.families', groupNames(menusContentField, 'families'), Object.keys(menus.families)],
+    [
+      'menus.signatureDishes',
+      groupNames(menusContentField, 'signatureDishes'),
+      Object.keys(menus.signatureDishes),
+    ],
+    [
+      'menus.signatureMenus',
+      groupNames(menusContentField, 'signatureMenus'),
+      Object.keys(menus.signatureMenus),
+    ],
+    ['fresh.range', groupNames(freshContentField, 'range'), Object.keys(fresh.range)],
+    ['fresh.culinary', groupNames(freshContentField, 'culinary'), Object.keys(fresh.culinary)],
+    ['gallery.empty', groupNames(galleryContentField, 'empty'), Object.keys(gallery.empty)],
+    [
+      'experience.universe',
+      groupNames(experienceContentField, 'universe'),
+      Object.keys(experience.universe),
+    ],
+    [
+      'experience.pillars',
+      groupNames(experienceContentField, 'pillars'),
+      Object.keys(experience.pillars),
+    ],
+  ]
+
+  it.each(cases)('%s offers no field the page cannot render', (_name, offered, rendered) => {
+    expect(offered.length).toBeGreaterThan(0)
+    expect(offered.filter((field) => !rendered.includes(field))).toEqual([])
+  })
+
+  /** The repeated blocks, whose rows are objects rather than strings. */
+  it('matches the shape of every repeated block', () => {
+    expect(groupNames(servicesContentField, 'worlds', 'items').sort()).toEqual(['items', 'title'])
+    expect(groupNames(menusContentField, 'levels', 'items').sort()).toEqual([
+      'body',
+      'list',
+      'name',
+    ])
+    expect(groupNames(freshContentField, 'culinary', 'items').sort()).toEqual(['flavour', 'uses'])
+    expect(groupNames(experienceContentField, 'pillars', 'items').sort()).toEqual([
+      'detail',
+      'title',
+    ])
   })
 })

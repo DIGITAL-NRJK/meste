@@ -4,8 +4,15 @@ import type { Locale } from '@/lib/i18n/config'
 import { getMenusBaseline } from '@/lib/pages/menus/content'
 import type { MenuFamily, MenusContent, SignatureDish } from '@/lib/pages/menus/types'
 import { getPayloadClient } from '@/lib/payload/client'
+import {
+  mergeClosing,
+  mergeIntro,
+  mergeList,
+  mergeStrings,
+  readTextList,
+} from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
-import { isRecord, readString } from '@/lib/payload/records'
+import { isRecord, readPath, readString } from '@/lib/payload/records'
 
 const CATEGORY_LIMIT = 24
 const ITEM_LIMIT = 300
@@ -102,18 +109,43 @@ async function queryMenusContent(locale: Locale): Promise<MenusContent> {
       return title ? [title] : []
     })
 
+    const doc = page.docs[0]
+    const editorial = readPath(doc, 'editorial')
+    const content = readPath(doc, 'menusContent')
+    const frame = ['eyebrow', 'heading', 'headingAccent'] as const
+
     return {
       ...baseline,
-      families: families.length > 0 ? { ...baseline.families, items: families } : baseline.families,
-      meta: mergePageMeta(baseline.meta, page.docs[0]),
-      signatureDishes:
-        featured.length > 0
-          ? { ...baseline.signatureDishes, items: featured }
-          : baseline.signatureDishes,
-      signatureMenus:
-        menuTitles.length > 0
-          ? { ...baseline.signatureMenus, items: menuTitles }
-          : baseline.signatureMenus,
+      closing: mergeClosing(baseline.closing, readPath(editorial, 'closing')),
+      families: {
+        ...mergeStrings(baseline.families, readPath(content, 'families'), [...frame]),
+        items: families.length > 0 ? families : baseline.families.items,
+      },
+      intro: mergeIntro(baseline.intro, readPath(editorial, 'intro')),
+      levels: {
+        ...mergeStrings(baseline.levels, readPath(content, 'levels'), [...frame]),
+        items: mergeList(baseline.levels.items, readPath(content, 'levels', 'items'), (entry) => {
+          const name = readString(readPath(entry, 'name'))
+          const body = readString(readPath(entry, 'body'))
+
+          return name && body ? { body, list: readTextList(readPath(entry, 'list')), name } : null
+        }),
+      },
+      meta: mergePageMeta(baseline.meta, doc),
+      signatureDishes: {
+        ...mergeStrings(baseline.signatureDishes, readPath(content, 'signatureDishes'), [
+          ...frame,
+          'intro',
+        ]),
+        items: featured.length > 0 ? featured : baseline.signatureDishes.items,
+      },
+      signatureMenus: {
+        ...mergeStrings(baseline.signatureMenus, readPath(content, 'signatureMenus'), [
+          ...frame,
+          'note',
+        ]),
+        items: menuTitles.length > 0 ? menuTitles : baseline.signatureMenus.items,
+      },
     }
   } catch (error) {
     console.error('[menus] falling back to the editorial baseline', error)

@@ -397,6 +397,225 @@ export interface Page {
     eyebrow?: string | null;
     heading?: string | null;
   };
+  /**
+   * Leave empty to keep the wording currently published on the site.
+   */
+  servicesContent?: {
+    worlds?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      /**
+       * One block per world. Replaced as a set.
+       */
+      items?:
+        | {
+            title?: string | null;
+            /**
+             * One row per line.
+             */
+            items?:
+              | {
+                  text: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    /**
+     * Leave empty to keep the wording currently published on the site. The entries themselves are maintained in Content → Reception formats.
+     */
+    formats?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      note?: string | null;
+    };
+    /**
+     * Shown while no client may be named. A reference appears on the site only once it is published and carries recorded permission to be displayed.
+     */
+    references?: {
+      eyebrow?: string | null;
+      heading?: string | null;
+      body?: string | null;
+    };
+  };
+  /**
+   * Leave empty to keep the wording currently published on the site.
+   */
+  menusContent?: {
+    levels?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      /**
+       * One block per level. Replaced as a set.
+       */
+      items?:
+        | {
+            name?: string | null;
+            body?: string | null;
+            /**
+             * Optional. Rendered under the body.
+             */
+            list?:
+              | {
+                  text: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    /**
+     * Leave empty to keep the wording currently published on the site. The entries themselves are maintained in Content → Menu categories and Menu items.
+     */
+    families?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+    };
+    /**
+     * Leave empty to keep the wording currently published on the site. The entries themselves are maintained in Content → Menu items, by marking a dish as featured.
+     */
+    signatureDishes?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      intro?: string | null;
+    };
+    /**
+     * Leave empty to keep the wording currently published on the site. The entries themselves are maintained in Content → Signature menus.
+     */
+    signatureMenus?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      note?: string | null;
+    };
+  };
+  /**
+   * Leave empty to keep the wording currently published on the site.
+   */
+  freshContent?: {
+    /**
+     * Leave empty to keep the wording currently published on the site. The entries themselves are maintained in Content → Fresh products.
+     */
+    range?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      note?: string | null;
+      signature?: string | null;
+    };
+    culinary?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      intro?: string | null;
+      /**
+       * States that these are possibilities, not recipes in service. Removing it turns a suggestion into a claim about what is actually cooked.
+       */
+      caveat?: string | null;
+      /**
+       * One block per flavour. Replaced as a set.
+       */
+      items?:
+        | {
+            flavour?: string | null;
+            /**
+             * One row per suggestion.
+             */
+            uses?:
+              | {
+                  text: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+  };
+  /**
+   * Leave empty to keep the wording currently published on the site. The entries themselves are maintained in Content → Gallery.
+   */
+  galleryContent?: {
+    /**
+     * Shown while no photograph is published. It is the launch state.
+     */
+    empty?: {
+      heading?: string | null;
+      body?: string | null;
+    };
+  };
+  /**
+   * Leave empty to keep the wording currently published on the site.
+   */
+  experienceContent?: {
+    universe?: {
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      heading?: string | null;
+      headingAccent?: string | null;
+      intro?: string | null;
+      /**
+       * One row per line.
+       */
+      items?:
+        | {
+            text: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    pillars?: {
+      heading?: string | null;
+      /**
+       * One block per pillar. Replaced as a set.
+       */
+      items?:
+        | {
+            title?: string | null;
+            detail?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    /**
+     * States that the concept is in development. Removing it publishes a concept as though it were already running.
+     */
+    disclaimer?: string | null;
+  };
   layout?:
     | (
         | {
@@ -1916,6 +2135,166 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         eyebrow?: T;
         heading?: T;
+      };
+  servicesContent?:
+    | T
+    | {
+        worlds?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    items?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+            };
+        formats?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              note?: T;
+            };
+        references?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              body?: T;
+            };
+      };
+  menusContent?:
+    | T
+    | {
+        levels?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              items?:
+                | T
+                | {
+                    name?: T;
+                    body?: T;
+                    list?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+            };
+        families?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+            };
+        signatureDishes?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              intro?: T;
+            };
+        signatureMenus?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              note?: T;
+            };
+      };
+  freshContent?:
+    | T
+    | {
+        range?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              note?: T;
+              signature?: T;
+            };
+        culinary?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              intro?: T;
+              caveat?: T;
+              items?:
+                | T
+                | {
+                    flavour?: T;
+                    uses?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+            };
+      };
+  galleryContent?:
+    | T
+    | {
+        empty?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+            };
+      };
+  experienceContent?:
+    | T
+    | {
+        universe?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingAccent?: T;
+              intro?: T;
+              items?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+            };
+        pillars?:
+          | T
+          | {
+              heading?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    detail?: T;
+                    id?: T;
+                  };
+            };
+        disclaimer?: T;
       };
   layout?:
     | T

@@ -4,8 +4,15 @@ import type { Locale } from '@/lib/i18n/config'
 import { getServicesBaseline } from '@/lib/pages/services/content'
 import type { ReceptionFormat, ServicesContent } from '@/lib/pages/services/types'
 import { getPayloadClient } from '@/lib/payload/client'
+import {
+  mergeClosing,
+  mergeIntro,
+  mergeList,
+  mergeStrings,
+  readTextList,
+} from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
-import { readString, withImage } from '@/lib/payload/records'
+import { readPath, readString, withImage } from '@/lib/payload/records'
 
 const LIST_LIMIT = 12
 
@@ -68,11 +75,44 @@ async function queryServicesContent(locale: Locale): Promise<ServicesContent> {
       ]
     })
 
+    const doc = page.docs[0]
+    const editorial = readPath(doc, 'editorial')
+    const content = readPath(doc, 'servicesContent')
+
+    const worlds = mergeStrings(baseline.worlds, readPath(content, 'worlds'), [
+      'eyebrow',
+      'heading',
+      'headingAccent',
+    ])
+
     return {
       ...baseline,
-      formats:
-        formatItems.length > 0 ? { ...baseline.formats, items: formatItems } : baseline.formats,
-      meta: mergePageMeta(baseline.meta, page.docs[0]),
+      closing: mergeClosing(baseline.closing, readPath(editorial, 'closing')),
+      formats: {
+        ...mergeStrings(baseline.formats, readPath(content, 'formats'), [
+          'eyebrow',
+          'heading',
+          'headingAccent',
+          'note',
+        ]),
+        items: formatItems.length > 0 ? formatItems : baseline.formats.items,
+      },
+      intro: mergeIntro(baseline.intro, readPath(editorial, 'intro')),
+      meta: mergePageMeta(baseline.meta, doc),
+      references: mergeStrings(baseline.references, readPath(content, 'references'), [
+        'body',
+        'eyebrow',
+        'heading',
+      ]),
+      worlds: {
+        ...worlds,
+        items: mergeList(baseline.worlds.items, readPath(content, 'worlds', 'items'), (entry) => {
+          const title = readString(readPath(entry, 'title'))
+          const items = readTextList(readPath(entry, 'items'))
+
+          return title && items.length > 0 ? { items, title } : null
+        }),
+      },
     }
   } catch (error) {
     console.error('[services] falling back to the editorial baseline', error)

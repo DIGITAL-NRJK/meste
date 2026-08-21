@@ -4,8 +4,15 @@ import type { Locale } from '@/lib/i18n/config'
 import { getFreshBaseline } from '@/lib/pages/fresh/content'
 import type { FreshContent } from '@/lib/pages/fresh/types'
 import { getPayloadClient } from '@/lib/payload/client'
+import {
+  mergeClosing,
+  mergeIntro,
+  mergeList,
+  mergeStrings,
+  readTextList,
+} from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
-import { readString, withImage } from '@/lib/payload/records'
+import { readPath, readString, withImage } from '@/lib/payload/records'
 
 const LIST_LIMIT = 12
 
@@ -55,14 +62,42 @@ async function queryFreshContent(locale: Locale): Promise<FreshContent> {
 
     const firstCan = products.docs.find((doc) => doc.canImage)?.canImage
 
+    const doc = page.docs[0]
+    const editorial = readPath(doc, 'editorial')
+    const content = readPath(doc, 'freshContent')
+    const frame = ['eyebrow', 'heading', 'headingAccent'] as const
+    const intro = mergeIntro(baseline.intro, readPath(editorial, 'intro'))
+
     return {
       ...baseline,
-      intro: {
-        ...baseline.intro,
-        media: withImage(baseline.intro.media, firstCan),
+      closing: mergeClosing(baseline.closing, readPath(editorial, 'closing')),
+      culinary: {
+        ...mergeStrings(baseline.culinary, readPath(content, 'culinary'), [
+          ...frame,
+          'caveat',
+          'intro',
+        ]),
+        items: mergeList(
+          baseline.culinary.items,
+          readPath(content, 'culinary', 'items'),
+          (entry) => {
+            const flavour = readString(readPath(entry, 'flavour'))
+            const uses = readTextList(readPath(entry, 'uses'))
+
+            return flavour && uses.length > 0 ? { flavour, uses } : null
+          },
+        ),
       },
-      meta: mergePageMeta(baseline.meta, page.docs[0]),
-      range: names.length > 0 ? { ...baseline.range, products: names } : baseline.range,
+      intro: { ...intro, media: withImage(baseline.intro.media, firstCan) },
+      meta: mergePageMeta(baseline.meta, doc),
+      range: {
+        ...mergeStrings(baseline.range, readPath(content, 'range'), [
+          ...frame,
+          'note',
+          'signature',
+        ]),
+        products: names.length > 0 ? names : baseline.range.products,
+      },
     }
   } catch (error) {
     console.error('[fresh] falling back to the editorial baseline', error)
