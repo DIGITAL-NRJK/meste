@@ -1,16 +1,41 @@
 import { z } from 'zod'
 
-const optionalString = z.preprocess(
-  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
-  z.string().trim().optional(),
-)
+const blankToUndefined = (value: unknown) =>
+  typeof value === 'string' && value.trim() === '' ? undefined : value
+
+const optionalString = z.preprocess(blankToUndefined, z.string().trim().optional())
+
+/**
+ * Resolves the canonical site origin.
+ *
+ * Netlify injects a variable that has no value for the current deploy context
+ * as an empty string rather than omitting it, and `z.url()` rejects `''` long
+ * before `.default()` would ever run. That is what killed every dynamic route
+ * on deploy previews: the schema threw while `payload.config.ts` was still
+ * loading, so the function died before it could serve anything and every
+ * request came back as a bare `Internal Server Error` — no page, no digest.
+ *
+ * Preview origins change on every build, so the value cannot live in the
+ * Netlify UI. `netlify.toml` exports it for the build, which is what Next.js
+ * inlines into the client bundle, but the function's own environment never
+ * sees that export. Netlify does publish its own deploy URLs at runtime, and
+ * they are the honest answer when nothing else is configured.
+ */
+const siteURL = z.preprocess((value) => {
+  const candidates = [value, process.env.DEPLOY_PRIME_URL, process.env.URL]
+  const configured = candidates.find(
+    (candidate) => typeof candidate === 'string' && candidate.trim() !== '',
+  )
+
+  return typeof configured === 'string' ? configured.trim() : 'http://localhost:3000'
+}, z.url())
 
 const serverSchema = z
   .object({
     CONTEXT: optionalString,
     DATABASE_URL: z.string().trim().min(1, 'DATABASE_URL is required'),
     DATABASE_URL_UNPOOLED: optionalString.pipe(z.url().optional()),
-    NEXT_PUBLIC_SERVER_URL: z.url().default('http://localhost:3000'),
+    NEXT_PUBLIC_SERVER_URL: siteURL,
     PAYLOAD_SECRET: z.string().min(32, 'PAYLOAD_SECRET must contain at least 32 characters'),
     R2_ACCESS_KEY_ID: optionalString,
     R2_ACCOUNT_ID: optionalString,
