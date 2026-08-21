@@ -308,6 +308,95 @@ export interface Page {
    */
   slug: string;
   pageKind: 'about' | 'contact' | 'editorial' | 'experience' | 'fresh' | 'gallery' | 'local-seo' | 'menus' | 'services';
+  /**
+   * Leave empty to keep the wording currently published on the site.
+   */
+  editorial?: {
+    intro?: {
+      /**
+       * The small label above the page title.
+       */
+      eyebrow?: string | null;
+      /**
+       * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+       */
+      headingLead?: string | null;
+      headingAccent?: string | null;
+      /**
+       * One or two sentences under the title.
+       */
+      lede?: string | null;
+    };
+    closing?: {
+      heading?: string | null;
+      body?: string | null;
+      action?: {
+        label?: string | null;
+        /**
+         * Where the button leads. The localized URL is resolved by the site.
+         */
+        route?: ('about' | 'contact' | 'gallery' | 'fresh' | 'menus' | 'quote' | 'services' | 'experience') | null;
+      };
+    };
+  };
+  /**
+   * Leave empty to keep the wording currently published on the site. Chapters are replaced as a set: publish all of them or none.
+   */
+  aboutStory?: {
+    /**
+     * The portrait beside the opening. Until one is uploaded the page shows a labelled placeholder naming the shoot that is missing — it never invents an image.
+     */
+    introImage?: (number | null) | Media;
+    eyebrow?: string | null;
+    /**
+     * Section headings are set in two parts: the lead is typographically neutral, the accent is the emphasised half. Fill both or neither.
+     */
+    heading?: string | null;
+    headingAccent?: string | null;
+    /**
+     * A chapter needs a title and at least one paragraph to count. Incomplete rows are ignored rather than published half-empty.
+     */
+    chapters?:
+      | {
+          /**
+           * The short marker in the margin, e.g. a place or a period.
+           */
+          label?: string | null;
+          title?: string | null;
+          /**
+           * One row per paragraph.
+           */
+          body?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          /**
+           * Optional. Rendered as a list under the paragraphs.
+           */
+          list?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+    pullQuote?: {
+      text?: string | null;
+      attribution?: string | null;
+    };
+  };
+  /**
+   * Leave empty to keep the wording currently published on the site. The contact details themselves live in Site → Contact settings.
+   */
+  contactChannels?: {
+    eyebrow?: string | null;
+    heading?: string | null;
+  };
   layout?:
     | (
         | {
@@ -1764,6 +1853,70 @@ export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   pageKind?: T;
+  editorial?:
+    | T
+    | {
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              headingLead?: T;
+              headingAccent?: T;
+              lede?: T;
+            };
+        closing?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              action?:
+                | T
+                | {
+                    label?: T;
+                    route?: T;
+                  };
+            };
+      };
+  aboutStory?:
+    | T
+    | {
+        introImage?: T;
+        eyebrow?: T;
+        heading?: T;
+        headingAccent?: T;
+        chapters?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              body?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              list?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              image?: T;
+              id?: T;
+            };
+        pullQuote?:
+          | T
+          | {
+              text?: T;
+              attribution?: T;
+            };
+      };
+  contactChannels?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+      };
   layout?:
     | T
     | {

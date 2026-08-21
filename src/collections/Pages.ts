@@ -5,6 +5,11 @@ import { createEditorialCollection } from '@/collections/fields/editorial'
 import { seedKeyField } from '@/collections/fields/shared'
 import { slugField } from '@/collections/fields/slug'
 import { createPreviewURL } from '@/lib/preview/urls'
+import {
+  aboutStoryField,
+  contactChannelsField,
+  pageEditorialField,
+} from '@/collections/fields/pageContent'
 
 const preview = createPreviewURL(({ doc, locale }) => {
   const kind = typeof doc.pageKind === 'string' ? doc.pageKind : 'editorial'
@@ -57,9 +62,13 @@ export const Pages: CollectionConfig = createEditorialCollection({
       ],
       required: true,
     },
+    pageEditorialField,
+    aboutStoryField,
+    contactChannelsField,
     {
       name: 'layout',
       type: 'blocks',
+      admin: { hidden: true },
       blocks: controlledBlocks,
       maxRows: 20,
     },
