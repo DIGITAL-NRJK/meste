@@ -49,6 +49,33 @@ const serverSchema = z
 
 export type ServerEnvironment = z.infer<typeof serverSchema>
 
+/**
+ * The six variables that R2 needs. Listed once so that the validation rule
+ * ("all of them or none"), the storage plugin and the upload directory can
+ * never disagree about what "configured" means.
+ */
+export const r2Keys = [
+  'R2_ACCESS_KEY_ID',
+  'R2_ACCOUNT_ID',
+  'R2_BUCKET',
+  'R2_ENDPOINT',
+  'R2_PUBLIC_URL',
+  'R2_SECRET_ACCESS_KEY',
+] as const
+
+/**
+ * Answers the R2 question from the raw environment, without validating
+ * anything else.
+ *
+ * `getServerEnvironment` parses the whole schema and throws when the database
+ * is not configured, which is right for the application and wrong for a module
+ * that only wants to know where to put uploads. Reaching for the full parse
+ * there once made importing the media taxonomy require a DATABASE_URL.
+ */
+export function hasR2Configured(environment: NodeJS.ProcessEnv = process.env): boolean {
+  return r2Keys.every((key) => Boolean(environment[key]?.trim()))
+}
+
 let cachedEnvironment: ServerEnvironment | undefined
 
 export function getServerEnvironment(): ServerEnvironment {
@@ -57,14 +84,7 @@ export function getServerEnvironment(): ServerEnvironment {
 }
 
 export function hasR2Storage(environment: ServerEnvironment): boolean {
-  return Boolean(
-    environment.R2_ACCESS_KEY_ID &&
-    environment.R2_ACCOUNT_ID &&
-    environment.R2_BUCKET &&
-    environment.R2_ENDPOINT &&
-    environment.R2_PUBLIC_URL &&
-    environment.R2_SECRET_ACCESS_KEY,
-  )
+  return r2Keys.every((key) => Boolean(environment[key]))
 }
 
 export function resetServerEnvironmentForTests(): void {
