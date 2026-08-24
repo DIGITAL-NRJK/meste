@@ -208,6 +208,7 @@ export interface User {
  */
 export interface Media {
   id: number;
+  prefix?: string | null;
   /**
    * Describe the image purpose and visible content; do not begin with “image of”.
    */
@@ -1983,6 +1984,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  prefix?: T;
   alt?: T;
   caption?: T;
   category?: T;

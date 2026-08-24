@@ -67,6 +67,28 @@ export const Media: CollectionConfig = {
     useAsTitle: 'alt',
   },
   fields: [
+    /**
+     * Declared here so the database schema never depends on the environment.
+     *
+     * The R2 storage plugin adds this field, but only when R2 is configured —
+     * and migrations are generated on a machine that has no R2 credentials.
+     * The column was therefore missing everywhere while production, which does
+     * load the plugin, queried it on every media listing: `column media.prefix
+     * does not exist`, and no image could be chosen in the admin.
+     *
+     * `getFields` in `@payloadcms/plugin-cloud-storage` looks for an existing
+     * `prefix` field and merges its own definition into it rather than adding a
+     * second one, so declaring it changes nothing about how the plugin behaves.
+     * The default value still comes from the plugin's `prefix` option.
+     */
+    {
+      name: 'prefix',
+      type: 'text',
+      admin: {
+        hidden: true,
+        readOnly: true,
+      },
+    },
     {
       name: 'alt',
       type: 'text',
