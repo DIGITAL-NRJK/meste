@@ -3,10 +3,10 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getGalleryBaseline } from '@/lib/pages/gallery/content'
 import type { GalleryContent, GalleryItem } from '@/lib/pages/gallery/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import { mergeClosing, mergeIntro, mergeStrings } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import { readPath, readString, resolveImage } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 const GALLERY_LIMIT = 120
 
@@ -21,9 +21,7 @@ const GALLERY_LIMIT = 120
 async function queryGalleryContent(locale: Locale): Promise<GalleryContent> {
   const baseline = getGalleryBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
-
+  return withBaseline('gallery', baseline, async (payload) => {
     const [entries, page] = await Promise.all([
       payload.find({
         collection: 'gallery',
@@ -83,10 +81,7 @@ async function queryGalleryContent(locale: Locale): Promise<GalleryContent> {
       items,
       meta: mergePageMeta(baseline.meta, doc),
     }
-  } catch (error) {
-    console.error('[gallery] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getGalleryContent(locale: Locale): Promise<GalleryContent> {

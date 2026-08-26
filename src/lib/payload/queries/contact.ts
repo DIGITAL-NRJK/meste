@@ -3,10 +3,10 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getContactBaseline } from '@/lib/pages/contact/content'
 import type { ContactContent } from '@/lib/pages/contact/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import { mergeClosing, mergeIntro } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import { readPath, readString } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 /**
  * Framing copy for the contact page, merged over the approved baseline field by
@@ -21,8 +21,7 @@ import { readPath, readString } from '@/lib/payload/records'
 async function queryContactContent(locale: Locale): Promise<ContactContent> {
   const baseline = getContactBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('contact', baseline, async (payload) => {
     const result = await payload.find({
       collection: 'pages',
       depth: 1,
@@ -55,10 +54,7 @@ async function queryContactContent(locale: Locale): Promise<ContactContent> {
       meta: mergePageMeta(baseline.meta, doc),
       skipToContent: baseline.skipToContent,
     }
-  } catch (error) {
-    console.error('[contact] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getContactContent(locale: Locale): Promise<ContactContent> {

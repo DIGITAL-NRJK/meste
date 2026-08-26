@@ -1,11 +1,11 @@
 import { unstable_cache } from 'next/cache'
 
 import type { Locale } from '@/lib/i18n/config'
-import { getPayloadClient } from '@/lib/payload/client'
 import { isRecord, readArray, readPath, readString } from '@/lib/payload/records'
 import { type RouteKey, resolveRoute } from '@/lib/routes'
 import { buildWhatsAppHref, getChromeBaseline } from '@/lib/site/chrome'
 import type { ContactLine, FooterColumn, NavItem, SiteChrome } from '@/lib/site/types'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 function readNavItems(value: unknown, fallbackRoute: RouteKey): NavItem[] {
   return readArray(value).flatMap((entry) => {
@@ -33,8 +33,7 @@ function readContactLines(value: unknown): ContactLine[] {
 async function queryChrome(locale: Locale): Promise<SiteChrome> {
   const baseline = getChromeBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('chrome', baseline, async (payload) => {
     const globalOptions = {
       depth: 1,
       draft: false,
@@ -116,10 +115,7 @@ async function queryChrome(locale: Locale): Promise<SiteChrome> {
         ? { label: primaryLabel, route: resolveRoute(readPath(header, 'primaryAction', 'route')) }
         : baseline.primaryAction,
     }
-  } catch (error) {
-    console.error('[chrome] falling back to the baseline navigation', error)
-    return baseline
-  }
+  })
 }
 
 export function getSiteChrome(locale: Locale): Promise<SiteChrome> {

@@ -3,7 +3,6 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getFreshBaseline } from '@/lib/pages/fresh/content'
 import type { FreshContent } from '@/lib/pages/fresh/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import {
   mergeClosing,
   mergeIntro,
@@ -13,6 +12,7 @@ import {
 } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import { readPath, readString, withImage } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 const LIST_LIMIT = 12
 
@@ -27,9 +27,7 @@ const LIST_LIMIT = 12
 async function queryFreshContent(locale: Locale): Promise<FreshContent> {
   const baseline = getFreshBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
-
+  return withBaseline('fresh', baseline, async (payload) => {
     const [products, page] = await Promise.all([
       payload.find({
         collection: 'fresh-products',
@@ -99,10 +97,7 @@ async function queryFreshContent(locale: Locale): Promise<FreshContent> {
         products: names.length > 0 ? names : baseline.range.products,
       },
     }
-  } catch (error) {
-    console.error('[fresh] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getFreshContent(locale: Locale): Promise<FreshContent> {

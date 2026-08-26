@@ -1,4 +1,5 @@
 import { revalidateTag } from 'next/cache'
+import { after } from 'next/server'
 import type { CollectionConfig, GlobalConfig } from 'payload'
 
 function shouldSkip(context: Record<string, unknown>): boolean {
@@ -6,27 +7,35 @@ function shouldSkip(context: Record<string, unknown>): boolean {
 }
 
 /**
- * Tells the cache what changed, and never breaks a save if it cannot.
+ * Tells the cache what changed, once the response is out of the way.
  *
- * Next.js refuses `revalidateTag` during a render pass, and Payload's admin
- * writes during one: opening a create form autosaves a draft while the view is
- * still rendering. Letting that rejection escape kills the render — the editor
- * gets a blank screen and cannot create a document at all. That is what
- * happened the first time anyone tried to add a page.
+ * Next.js refuses `revalidateTag` while a route is rendering — the guard tests
+ * `workUnitStore.phase === 'render'` and nothing else. Payload's admin writes
+ * during a render: opening a create form autosaves a draft, and saving an
+ * existing document goes the same way. Calling it directly therefore threw on
+ * every write from the admin, which killed the render and left the editor
+ * looking at a blank screen.
  *
- * A save must not fail because a cache could not be told about it. The writes
- * that matter to the public site — publishing, editing a published document —
- * run through a server action rather than a render, and still revalidate
- * normally. What is skipped here is the autosaved draft, which no visitor can
- * see anyway.
+ * `after` is the mechanism built for this. It queues the work until the request
+ * closes and flips the phase to `'after'` first, so the same call is accepted
+ * on the other side of the response. The revalidation genuinely happens — it is
+ * not swallowed, merely postponed by a few milliseconds.
  */
 function invalidate(tags: string[]): void {
-  for (const tag of new Set([...tags, 'sitemap'])) {
-    try {
-      revalidateTag(tag, 'max')
-    } catch (error) {
-      console.warn(`[revalidate] could not invalidate ${tag}`, error)
-    }
+  const unique = [...new Set([...tags, 'sitemap'])]
+
+  try {
+    after(() => {
+      for (const tag of unique) {
+        revalidateTag(tag, 'max')
+      }
+    })
+  } catch (error) {
+    // `after` needs a request to attach itself to. A document written outside
+    // one — the seed, a migration, a script — has no rendered page to
+    // invalidate, so there is nothing to do but say so. A write must never fail
+    // because a cache could not be notified.
+    console.warn('[revalidate] no request to defer to', error)
   }
 }
 

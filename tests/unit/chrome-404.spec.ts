@@ -56,8 +56,8 @@ describe('where uploads are written', () => {
 
   const load = async () => {
     vi.resetModules()
-    const { Media } = await import('@/collections/Media')
-    return Media.upload && typeof Media.upload === 'object' ? Media.upload.staticDir : undefined
+    const { uploadDirectory } = await import('@/lib/storage/uploads')
+    return uploadDirectory()
   }
 
   const withR2 = {
