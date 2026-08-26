@@ -3,7 +3,6 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getMenusBaseline } from '@/lib/pages/menus/content'
 import type { MenuFamily, MenusContent, SignatureDish } from '@/lib/pages/menus/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import {
   mergeClosing,
   mergeIntro,
@@ -13,6 +12,7 @@ import {
 } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import { isRecord, readPath, readString } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 const CATEGORY_LIMIT = 24
 const ITEM_LIMIT = 300
@@ -41,8 +41,7 @@ function categoryId(value: unknown): number | string | null {
 async function queryMenusContent(locale: Locale): Promise<MenusContent> {
   const baseline = getMenusBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('menus', baseline, async (payload) => {
     const listOptions = {
       depth: 1,
       draft: false,
@@ -147,10 +146,7 @@ async function queryMenusContent(locale: Locale): Promise<MenusContent> {
         items: menuTitles.length > 0 ? menuTitles : baseline.signatureMenus.items,
       },
     }
-  } catch (error) {
-    console.error('[menus] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getMenusContent(locale: Locale): Promise<MenusContent> {

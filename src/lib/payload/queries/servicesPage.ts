@@ -3,7 +3,6 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getServicesBaseline } from '@/lib/pages/services/content'
 import type { ReceptionFormat, ServicesContent } from '@/lib/pages/services/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import {
   mergeClosing,
   mergeIntro,
@@ -13,6 +12,7 @@ import {
 } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import { readPath, readString, withImage } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 const LIST_LIMIT = 12
 
@@ -29,8 +29,7 @@ const LIST_LIMIT = 12
 async function queryServicesContent(locale: Locale): Promise<ServicesContent> {
   const baseline = getServicesBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('services', baseline, async (payload) => {
     const listOptions = {
       depth: 1,
       draft: false,
@@ -114,10 +113,7 @@ async function queryServicesContent(locale: Locale): Promise<ServicesContent> {
         }),
       },
     }
-  } catch (error) {
-    console.error('[services] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getServicesContent(locale: Locale): Promise<ServicesContent> {

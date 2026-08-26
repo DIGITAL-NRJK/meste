@@ -3,7 +3,6 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getExperienceBaseline } from '@/lib/pages/experience/content'
 import type { ExperienceContent } from '@/lib/pages/experience/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import {
   mergeClosing,
   mergeIntro,
@@ -13,6 +12,7 @@ import {
 } from '@/lib/payload/queries/pageContent'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import { readPath, readString } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 /**
  * Metadata only.
@@ -24,8 +24,7 @@ import { readPath, readString } from '@/lib/payload/records'
 async function queryExperienceContent(locale: Locale): Promise<ExperienceContent> {
   const baseline = getExperienceBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('experience', baseline, async (payload) => {
     const page = await payload.find({
       collection: 'pages',
       depth: 1,
@@ -70,10 +69,7 @@ async function queryExperienceContent(locale: Locale): Promise<ExperienceContent
         })(),
       },
     }
-  } catch (error) {
-    console.error('[experience] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getExperienceContent(locale: Locale): Promise<ExperienceContent> {

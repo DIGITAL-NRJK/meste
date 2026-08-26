@@ -3,8 +3,8 @@ import { unstable_cache } from 'next/cache'
 import { getEntryBaseline } from '@/lib/entry/content'
 import type { EntryContent } from '@/lib/entry/types'
 import type { Locale } from '@/lib/i18n/config'
-import { getPayloadClient } from '@/lib/payload/client'
 import { readString } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 /**
  * The veil only appears when an editor has explicitly enabled it. Any field left
@@ -14,8 +14,9 @@ import { readString } from '@/lib/payload/records'
 async function queryEntryContent(locale: Locale): Promise<EntryContent> {
   const baseline = getEntryBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  // The veil stays off when anything goes wrong, rather than blocking the
+  // homepage behind a threshold that cannot render.
+  return withBaseline('entry', { ...baseline, enabled: false }, async (payload) => {
     const global = await payload.findGlobal({
       slug: 'entry-screen',
       depth: 0,
@@ -38,10 +39,7 @@ async function queryEntryContent(locale: Locale): Promise<EntryContent> {
       location: baseline.location,
       signature: baseline.signature,
     }
-  } catch (error) {
-    console.error('[entry] keeping the veil disabled', error)
-    return { ...baseline, enabled: false }
-  }
+  })
 }
 
 export function getEntryContent(locale: Locale): Promise<EntryContent> {

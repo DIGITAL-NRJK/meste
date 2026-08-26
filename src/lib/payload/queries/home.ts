@@ -3,9 +3,9 @@ import { unstable_cache } from 'next/cache'
 import { getHomeBaseline } from '@/lib/home/content'
 import type { DishContent, HomeContent, QuoteContent } from '@/lib/home/types'
 import type { Locale } from '@/lib/i18n/config'
-import { getPayloadClient } from '@/lib/payload/client'
 import { isRecord, readArray, readPath, readString, withImage } from '@/lib/payload/records'
 import { resolveRoute } from '@/lib/routes'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 const LIST_LIMIT = 12
 
@@ -22,8 +22,7 @@ const LIST_LIMIT = 12
 async function queryHomeContent(locale: Locale): Promise<HomeContent> {
   const baseline = getHomeBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('home', baseline, async (payload) => {
     const listOptions = {
       depth: 1,
       draft: false,
@@ -154,10 +153,7 @@ async function queryHomeContent(locale: Locale): Promise<HomeContent> {
       references: { ...baseline.references, quotes },
       worlds: worldItems.length > 0 ? { ...baseline.worlds, items: worldItems } : baseline.worlds,
     }
-  } catch (error) {
-    console.error('[home] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getHomeContent(locale: Locale): Promise<HomeContent> {

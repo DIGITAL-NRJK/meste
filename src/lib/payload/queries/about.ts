@@ -3,7 +3,6 @@ import { unstable_cache } from 'next/cache'
 import type { Locale } from '@/lib/i18n/config'
 import { getAboutBaseline } from '@/lib/pages/about/content'
 import type { AboutContent } from '@/lib/pages/about/types'
-import { getPayloadClient } from '@/lib/payload/client'
 import { mergePageMeta } from '@/lib/payload/queries/pageMeta'
 import {
   mergeChapters,
@@ -12,6 +11,7 @@ import {
   mergePullQuote,
 } from '@/lib/payload/queries/pageContent'
 import { readPath, readString, withImage } from '@/lib/payload/records'
+import { withBaseline } from '@/lib/payload/queries/withBaseline'
 
 /**
  * The story page merges the published `pages` entry over its approved baseline,
@@ -30,8 +30,7 @@ import { readPath, readString, withImage } from '@/lib/payload/records'
 async function queryAboutContent(locale: Locale): Promise<AboutContent> {
   const baseline = getAboutBaseline(locale)
 
-  try {
-    const payload = await getPayloadClient()
+  return withBaseline('about', baseline, async (payload) => {
     const result = await payload.find({
       collection: 'pages',
       depth: 1,
@@ -68,10 +67,7 @@ async function queryAboutContent(locale: Locale): Promise<AboutContent> {
       pullQuote: mergePullQuote(baseline.pullQuote, readPath(story, 'pullQuote')),
       skipToContent: baseline.skipToContent,
     }
-  } catch (error) {
-    console.error('[about] falling back to the editorial baseline', error)
-    return baseline
-  }
+  })
 }
 
 export function getAboutContent(locale: Locale): Promise<AboutContent> {
